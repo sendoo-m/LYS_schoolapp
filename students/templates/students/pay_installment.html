@@ -1,0 +1,22 @@
+{% extends 'students/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Pay Installment{% endblock %}
+
+{% block content %}
+    <h1>Pay Installment</h1>
+    <p>Student Name: {{ student_name }}</p>  <!-- Display the student's name -->
+    <p>National Number: {{ national_number }}</p>  <!-- Display the student's national number -->
+
+    {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+    
+    <form method="post">
+        {% csrf_token %}
+        {{ installment_form|crispy }}
+        <input type="submit" value="Pay Installment">
+    </form>
+{% endblock %}

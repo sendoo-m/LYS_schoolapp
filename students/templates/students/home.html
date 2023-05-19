@@ -1,0 +1,86 @@
+{% extends 'students/base.html' %}
+{% comment %} 
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <h1>Welcome to the School App</h1>
+{% for student in students %}
+<tr>
+    <td>{{ student.id }}</td>
+    <td>{{ student.full_name }}</td>
+    <td>{{ student.classroom }}</td>
+    <td>{{ student.phone_number }}</td>
+    <td>{{ student.email }}</td>
+    <td>{{ student.address }}</td>
+    <td><a href="{% url 'students:edit_student' student.id %}">Edit</a></td>
+</tr>
+{% endfor %}
+
+{% endblock %} {% endcomment %}
+
+{% comment %} {% extends 'students/base.html' %} {% endcomment %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <h1>Welcome to the School App</h1>
+    <form method="GET" action="{% url 'students:search_student' %}">
+        <input type="text" name="search_query" placeholder="Search by name">
+        <button type="submit">Search</button>
+      </form>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead class="table-primary">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>National Number</th>
+                    <th>Age</th>
+                    <th>Gender</th>
+                    
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                    <tr class="{% cycle 'table-secondry' 'table-White' %}"> <!--'table-light' 'table-success' -->
+                        <td>{{ student.id }}</td>
+                        <td>{{ student.name }}</td>
+                        <td>{{ student.national_number }}</td>
+                        <td>{{ student.age }}</td>
+                        <td>{{ student.gender }}</td>
+                        
+                        <td><a href="{% url 'students:edit_student' student.id %}" class="btn btn-primary btn-sm">Edit</a> <a href="{% url 'students:delete_student' student.id %}" class="btn btn-danger btn-sm"><i class="bi bi-trash">delete</i></a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!--  =======================  start pagination =======================  -->
+   
+<div class="d-flex justify-content-center">
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+<!-- End of pagination code -->
+    <!--  =======================  End pagination =======================  -->
+{% endblock %}

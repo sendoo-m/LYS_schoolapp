@@ -1,0 +1,105 @@
+{% load static %}
+{% load crispy_forms_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <!-- Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" integrity="sha384-MbOzQ7cJH6kPqfLxq5KxR9xb75rXmNOCu2x4nN8mWvJh+R9R6uXlRJ6JnolS+8d" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" integrity="sha384-..." crossorigin="anonymous">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" integrity="sha384-cDv3EaTN3k1l4edGUtU/i0lT/cEQWcA6k2up5fWfZs3rQ7oRw6RY+3xZiZrNj4n" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker3.min.css" integrity="sha384-jcLX09m1vPz+kLmWzWJlVJfcy8bUeovlFjxWLuQP6ZX+s8DMaFgjv3zt+zC78Mbz" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" >
+
+</head>
+<body>
+  <!-- Navbar -->
+  
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+      <a class="navbar-brand" href="#">Al Manar School Account App</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'students:home' %}">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'student_list' %}active{% endif %}" href="{% url 'students:student_list' %}">Students</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'add_student' %}active{% endif %}" href="{% url 'students:add_student' %}">Add Student</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'report' %}active{% endif %}" href="{% url 'students:report' %}">Reports</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'search_student' %}active{% endif %}" href="{% url 'students:search_student' %}">Search Students</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav">
+          {% if user.is_authenticated %}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle text-light" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                {{ user.username }}
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li><a class="dropdown-item" href="{% url 'account:password_change' %}">Change Password</a></li>
+                <li><a class="dropdown-item" href="{% url 'account:view_profile' %}">View Profile</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{% url 'account:logout' %}">Log out</a></li>
+              </ul>
+            </li>
+          {% else %}
+            <li class="nav-item">
+              <a class="nav-link text-light" href="{% url 'account:login' %}">Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-light" href="{% url 'account:signup' %}">Sign up</a>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+<div class="container py-4">
+    {% block content %}
+    {% endblock %}
+</div>
+<script>
+  $(document).ready(function() {
+    $('.dropdown-toggle').dropdown();
+  });
+</script>
+
+<!-- Footer -->
+<footer class="bg-light text-center py-3">
+    Made with <i class="bi bi-heart"></i> Eng. Mohamed Gamal | &copy; 2023 All rights reserved | Manar Code Team 
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/js/bootstrap-datepicker.min.js" integrity="sha384-ll9lhD6qvLx4TLbJ+rWwQ5vL9IMnRd7j3BGRDq3vWf2Y8bMaipX0vGnNrsgyxE8y" crossorigin="anonymous"></script>
+<!-- Bootstrap JavaScript and jQuery dependencies -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.3/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/5.0.0/js/bootstrap.min.js"></script>
+
+<!-- Bootstrap JavaScript and jQuery dependencies -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.3/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/5.0.0/js/bootstrap.min.js"></script>
+
+<!-- Initialize the Bootstrap dropdown component -->
+<script>
+  $(document).ready(function() {
+    $('.dropdown-toggle').dropdown();
+  });
+</script>
+</body>
+</html>

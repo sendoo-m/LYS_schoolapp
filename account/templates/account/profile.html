@@ -1,0 +1,15 @@
+{% extends 'students/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ user.username }} - Profile{% endblock %}
+
+{% block content %}
+
+<h1>Profile</h1>
+<p>Username: {{ user.username }}</p>
+<p>Email: {{ user.email }}</p>
+<p>Date of Enrollment: {{ user.date_of_enrollment }}</p>
+<p>National ID: {{ user.national_id }}</p>
+<p>Department: {{ user.get_department_display }}</p>
+<!-- Add more fields as needed -->
+{% endblock content %}
