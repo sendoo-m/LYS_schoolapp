@@ -1,0 +1,22 @@
+.card {
+  max-width: 600px;
+  margin: 0 auto;
+  background-color: #f8f9fa;
+}
+.card-title {
+  color: #007bff;
+  font-size: 2rem;
+  font-weight: 500;
+}
+.card-text {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+.btn-primary:hover {
+  background-color: #0069d9;
+  border-color: #0062cc;
+}

@@ -5,14 +5,17 @@ from .models import *
 from .forms import *
 from django.db.models import Sum
 from django.core.paginator import Paginator
-# from .models import EducationalStage, Expense
+from django.views.decorators.cache import never_cache
 from django.db.models import Q
+
+
+
+
 # Create your views here.
 
 # def home(request):
 #     return render(request, '/students/home.html')
 
-from django.core.paginator import Paginator
 
 def home(request):
     students = Student.objects.all()
@@ -99,32 +102,34 @@ def delete_student(request, student_id):
     return render(request, 'students/delete_student.html', context)
 
 
-@login_required
-def register(request):
-    if request.method == 'POST':
-        academic_year_form = AcademicYearForm(request.POST)
-        educational_stage_form = EducationalStageForm(request.POST)
-        classroom_form = ClassroomForm(request.POST)
-        if academic_year_form.is_valid() and educational_stage_form.is_valid() and classroom_form.is_valid():
-            academic_year = academic_year_form.save()
-            educational_stage = educational_stage_form.save()
-            classroom = classroom_form.save(commit=False)
-            classroom.educational_stage = educational_stage
-            classroom.academic_year = academic_year
-            classroom.save()
-            messages.success(request, 'Registration successful!')
-            return redirect('register')
-    else:
-        academic_year_form = AcademicYearForm()
-        educational_stage_form = EducationalStageForm()
-        classroom_form = ClassroomForm()
-    context = {
-        'academic_year_form': academic_year_form,
-        'educational_stage_form': educational_stage_form,
-        'classroom_form': classroom_form,
-    }
-    return render(request, 'students/register.html', context)
+# @login_required
+# def register(request):
+#     if request.method == 'POST':
+#         academic_year_form = AcademicYearForm(request.POST)
+#         educational_stage_form = EducationalStageForm(request.POST)
+#         classroom_form = ClassroomForm(request.POST)
+#         if academic_year_form.is_valid() and educational_stage_form.is_valid() and classroom_form.is_valid():
+#             academic_year = academic_year_form.save()
+#             educational_stage = educational_stage_form.save()
+#             classroom = classroom_form.save(commit=False)
+#             classroom.educational_stage = educational_stage
+#             classroom.academic_year = academic_year
+#             classroom.save()
+#             messages.success(request, 'Registration successful!')
+#             return redirect('register')
+#     else:
+#         academic_year_form = AcademicYearForm()
+#         educational_stage_form = EducationalStageForm()
+#         classroom_form = ClassroomForm()
+#     context = {
+#         'academic_year_form': academic_year_form,
+#         'educational_stage_form': educational_stage_form,
+#         'classroom_form': classroom_form,
+#     }
+#     return render(request, 'students/register.html', context)
 
+
+@never_cache
 @login_required
 def add_student(request):
     if request.method == 'POST':
@@ -143,54 +148,32 @@ def add_student(request):
     }
     return render(request, 'students/add_student.html', context)
 
-
+@never_cache
 @login_required
-def add_expense(request, pk):
-    student = get_object_or_404(Student, pk=pk)
+def add_expense(request, classroom_id):
+    classroom = get_object_or_404(Classroom, id=classroom_id)
+    students = classroom.students.all()
+
     if request.method == 'POST':
-        expense_form = ExpenseForm(request.POST)
-        if expense_form.is_valid():
-            expense = expense_form.save(commit=False)
-            expense.student = student
-            expense.save()
-            messages.success(request, 'Expense added successfully!')
-            return redirect('add_expense', pk=pk)
-    else:
-        expense_form = ExpenseForm()
+        expense_type = request.POST['expense_type']
+        amount = request.POST['amount']
+        date = request.POST['date']
+
+        for student in students:
+            Expense.objects.create(student=student, classroom=classroom, expense_type=expense_type, amount=amount, date=date)
+
+        messages.success(request, 'Expenses added successfully!')
+        return redirect('add_expense', classroom_id=classroom_id)
+
     context = {
-        'student': student,
-        'expense_form': expense_form,
+        'classroom': classroom,
     }
-    return render(request, 'students/add_expense.html', context) 
+
+    return render(request, 'students/add_expense.html', context)
 
 
 
-# @login_required
-# def pay_installment(request, pk):
-#     student = get_object_or_404(Student, pk=pk)
-#     student_name = student.name  # Retrieve the student's name
-#     national_number = student.national_number  # Retrieve the student's national number
-
-#     if request.method == 'POST':
-#         installment_form = TuitionForm(request.POST)
-#         if installment_form.is_valid():
-#             installment = installment_form.save(commit=False)
-#             installment.student = student
-#             installment.paid = True  # Mark the installment as paid
-#             installment.save()
-#             messages.success(request, 'Installment paid successfully!')
-#             return redirect('students:pay_installment', pk=pk)
-#     else:
-#         installment_form = TuitionForm()
-    
-#     context = {
-#         'student': student,
-#         'student_name': student_name,  # Pass the student's name to the template
-#         'national_number': national_number,  # Pass the student's national number to the template
-#         'installment_form': installment_form,
-#     }
-#     return render(request, 'students/pay_installment.html', context)
-
+@never_cache
 @login_required
 def pay_installment(request, pk):
     user = request.user
@@ -208,7 +191,7 @@ def pay_installment(request, pk):
             installment.paid = True
             installment.save()
             messages.success(request, 'Installment paid successfully!')
-            return redirect('students:pay_installment', pk=pk)
+            return redirect('students:student_detail', pk=pk)
     else:
         installment_form = TuitionForm()
 
@@ -220,72 +203,69 @@ def pay_installment(request, pk):
     }
     return render(request, 'students/pay_installment.html', context)
 
-# @login_required
-# def pay_installment(request, pk):
-#     student = get_object_or_404(Student, pk=pk)
-#     student_name = student.name  # Retrieve the student's name
-#     national_number = student.national_number  # Retrieve the student's national number
 
-#     if request.method == 'POST':
-#         installment_form = TuitionForm(request.POST)
-#         if installment_form.is_valid():
-#             installment = installment_form.save(commit=False)
-#             installment.student = student
-#             installment.paid = True  # Mark the installment as paid
-#             installment.payer = request.user.get_full_name()  # Set the payer's name automatically
-#             installment.save()
-#             messages.success(request, 'Installment paid successfully!')
-#             return redirect('students:pay_installment', pk=pk)
-#     else:
-#         installment_form = TuitionForm()
+def add_comment(request):
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('comments:list')
+    else:
+        form = CommentForm()
     
-#     context = {
-#         'student': student,
-#         'student_name': student_name,  # Pass the student's name to the template
-#         'national_number': national_number,  # Pass the student's national number to the template
-#         'installment_form': installment_form,
-#     }
-#     return render(request, 'students/pay_installment.html', context)
+    return render(request, 'add_comment.html', {'form': form})
 
+def comment_list(request):
+    comments = Comment.objects.all()
+    return render(request, 'comment_list.html', {'comments': comments})
+
+@never_cache
 @login_required
 def receipt(request, pk):
     tuition = get_object_or_404(Tuition, pk=pk)
+    student = tuition.student  # Retrieve the student from the tuition object
+    installments = Tuition.objects.filter(student=student)
+    total_paid = sum(installment.amount for installment in installments if installment.paid)
+    classroom = student.classroom.first()  # Retrieve the first classroom for the student
+    expenses = Expense.objects.filter(classroom=classroom)
+    total_expenses = sum(expense.amount for expense in expenses)
+    total_owed = total_expenses - total_paid
     if not tuition.paid:
         messages.warning(request, 'This installment has not been paid yet.')
-        return redirect('student_detail', pk=tuition.student.pk)
+        return redirect('student_detail', pk=student.pk)  # Use student.pk instead of tuition.student.pk
     else:
-        context = {'tuition': tuition}
+        context = {
+            'tuition': tuition,
+            'installments': installments,
+            'total_paid': total_paid,
+            'expenses': expenses,
+            'total_expenses': total_expenses,
+            'total_owed': total_owed,
+        }
         return render(request, 'students/receipt.html', context)
 
 
+
+@never_cache
 @login_required
 def student_detail(request, pk):
     student = get_object_or_404(Student, pk=pk)
     installments = Tuition.objects.filter(student=student)
     total_paid = sum(installment.amount for installment in installments if installment.paid)
+    classroom = student.classroom.first()  # retrieve the first classroom for the student
+    expenses = Expense.objects.filter(classroom=classroom)
+    total_expenses = sum(expense.amount for expense in expenses)
+    total_owed = total_expenses - total_paid
     context = {
-        'student': student, 
-        'installments': installments, 
-        'total_paid': total_paid}
+        'student': student,
+        'installments': installments,
+        'total_paid': total_paid,
+        'expenses': expenses,
+        'total_expenses': total_expenses,
+        'total_owed': total_owed,
+    }
     return render(request, 'students/student_detail.html', context)
 
-from django.views.generic.edit import CreateView
-from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin
-
-class PayInstallmentView(LoginRequiredMixin, CreateView):
-    model = Tuition
-    form_class = TuitionForm
-    template_name = 'students/pay_installment.html'
-    success_url = reverse_lazy('students:student_detail')
-
-    def form_valid(self, form):
-        form.instance.student = self.get_student()
-        form.instance.payer = self.request.user  # Set the payer to the current user
-        return super().form_valid(form)
-
-
-from django.db.models import Count, Sum
 
 def report(request):
     # Number of registered students
@@ -295,40 +275,7 @@ def report(request):
     total_paid_installments = Tuition.objects.filter(paid=True).count()
 
     # The total number of students who did not pay
-    # total_unpaid_students = Student.objects.filter(tuition__paid=False).distinct().count()
-    total_unpaid_students = Student.objects.filter(installments__paid=False).distinct().count()
-
-
-    # Total male students
-    total_male_students = Student.objects.filter(gender='M').count()
-
-    # Total female students
-    total_female_students = Student.objects.filter(gender='F').count()
-
-    # Show statistics for all data on the application
-    total_tuition = Tuition.objects.aggregate(total=Sum('amount'))['total']
-    context = {
-        'registered_students': registered_students,
-        'total_paid_installments': total_paid_installments,
-        'total_unpaid_students': total_unpaid_students,
-        'total_male_students': total_male_students,
-        'total_female_students': total_female_students,
-        # 'stages': stages,
-        'total_tuition': total_tuition,
-    }
-    return render(request, 'students/report.html', context)
-
-
-
-def all_reports(request):
-    # Number of registered students
-    total_students = Student.objects.all().count()
-
-    # Total installments that have been paid
-    total_paid_tuitions = Tuition.objects.filter(paid=True).aggregate(Sum('amount'))['amount__sum'] or 0
-
-    # The total number of students who did not pay
-    total_unpaid_students = Student.objects.exclude(tuition__paid=True).count()
+    total_unpaid_students = Student.objects.exclude(installments__paid=True).count()
 
     # Total male students
     total_male_students = Student.objects.filter(gender='M').count()
@@ -343,7 +290,7 @@ def all_reports(request):
         stage_students = Student.objects.filter(classroom=stage)
         total_stage_students = stage_students.count()
         paid_stage_tuitions = Tuition.objects.filter(student__in=stage_students, paid=True).aggregate(Sum('amount'))['amount__sum'] or 0
-        unpaid_stage_students = stage_students.exclude(tuition__paid=True).count()
+        unpaid_stage_students = stage_students.exclude(installments__paid=True).count()
         male_stage_students = stage_students.filter(gender='M').count()
         female_stage_students = stage_students.filter(gender='F').count()
         stage_stats.append({
@@ -357,12 +304,12 @@ def all_reports(request):
 
     # Show statistics for all data on the application
     total_tuitions = Tuition.objects.aggregate(Sum('amount'))['amount__sum'] or 0
-    total_paid_students = Student.objects.filter(tuition__paid=True).count()
+    total_paid_students = Student.objects.filter(installments__paid=True).count()
     total_unpaid_tuitions = Tuition.objects.filter(paid=False).aggregate(Sum('amount'))['amount__sum'] or 0
 
     context = {
-        'total_students': total_students,
-        'total_paid_tuitions': total_paid_tuitions,
+        'registered_students': registered_students,
+        'total_paid_installments': total_paid_installments,
         'total_unpaid_students': total_unpaid_students,
         'total_male_students': total_male_students,
         'total_female_students': total_female_students,
@@ -372,4 +319,33 @@ def all_reports(request):
         'total_unpaid_tuitions': total_unpaid_tuitions,
     }
 
+    return render(request, 'students/report.html', context)
+
+
+def all_reports(request):
+    stages = Classroom.objects.all()
+    stage_stats = []
+    
+    for stage in stages:
+        stage_students = Student.objects.filter(classroom=stage)
+        total_stage_students = stage_students.count()
+        
+        paid_stage_tuitions = Tuition.objects.filter(student__in=stage_students, paid=True).aggregate(Sum('amount'))['amount__sum'] or 0
+        unpaid_stage_students = stage_students.exclude(installments__paid=True).count()
+        total_stage_tuitions = stage_students.aggregate(Sum('installments__amount'))['installments__amount__sum'] or 0
+        
+        stage_stats.append({
+            'stage': stage,
+            'total_stage_students': total_stage_students,
+            'total_stage_tuitions': total_stage_tuitions,
+            'paid_stage_tuitions': paid_stage_tuitions,
+            'unpaid_stage_students': unpaid_stage_students,
+            'remaining_stage_tuitions': total_stage_tuitions - paid_stage_tuitions,
+        })
+
+    context = {
+        'stage_stats': stage_stats,
+    }
+
     return render(request, 'students/all_reports.html', context)
+

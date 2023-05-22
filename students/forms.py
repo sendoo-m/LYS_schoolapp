@@ -3,20 +3,6 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import *
 
-class AcademicYearForm(forms.ModelForm):
-    class Meta:
-        model = AcademicYear
-        fields = ['year']
-
-class EducationalStageForm(forms.ModelForm):
-    class Meta:
-        model = EducationalStage
-        fields = ['name']
-
-class ClassroomForm(forms.ModelForm):
-    class Meta:
-        model = Classroom
-        fields = ['name']
 
 class StudentForm(forms.ModelForm):
     class Meta:
@@ -57,3 +43,12 @@ class SignUpForm(UserCreationForm):
     class Meta:
         model = User
         fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2')
+
+
+from django import forms
+from .models import Comment
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['user', 'content']

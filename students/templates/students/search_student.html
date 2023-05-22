@@ -21,6 +21,7 @@
             <tr>
               <th>Name</th>
               <th>National Number</th>
+              {% comment %} <th>Status</th> {% endcomment %}
               <th>Age</th>
               <th>Actions</th>
             </tr>
@@ -30,6 +31,17 @@
               <tr>
                 <td>{{ student.name }}</td>
                 <td>{{ student.national_number }}</td>
+                {% comment %} <td> <!-- علامة الدفع باللون الاخضر-->
+                  {% if installment.paid %}
+                      <span class="status-mark status-paid">&#10004;</span>
+                  {% else %}
+                      {% if student.premium %}
+                          <span class="status-mark status-premium">&#9888;</span>
+                      {% else %}
+                          <span class="status-mark status-unpaid">&#10008;</span>
+                      {% endif %}
+                  {% endif %}
+              </td><!-- نهاية علامة الدفع بالالوان --> {% endcomment %}
                 <td>{{ student.age }}</td>
                 <td>
                   {% comment %} <a href="{% url 'students:edit_student' pk=student.pk %}" class="btn btn-primary btn-sm">Edit</a> {% endcomment %}

@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import logout as auth_logout
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -8,6 +7,8 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, Pass
 from django.contrib.auth import login, authenticate, update_session_auth_hash
 from django.views.generic import TemplateView
 from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView
+
+from django.contrib.auth import authenticate, login as auth_login
 
 
 from django import forms
@@ -59,8 +60,6 @@ def signup(request):
 # # =================== signup ===================
 
 # =================== Login  ===================
-from django.contrib.auth import authenticate, login as auth_login
-from django.contrib.auth.forms import AuthenticationForm
 
 def login_view(request):
     if request.method == 'POST':

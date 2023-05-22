@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" integrity="sha384-MbOzQ7cJH6kPqfLxq5KxR9xb75rXmNOCu2x4nN8mWvJh+R9R6uXlRJ6JnolS+8d" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" integrity="sha384-..." crossorigin="anonymous">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" integrity="sha384-cDv3EaTN3k1l4edGUtU/i0lT/cEQWcA6k2up5fWfZs3rQ7oRw6RY+3xZiZrNj4n" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker3.min.css" integrity="sha384-jcLX09m1vPz+kLmWzWJlVJfcy8bUeovlFjxWLuQP6ZX+s8DMaFgjv3zt+zC78Mbz" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" >
@@ -46,16 +46,14 @@
         </ul>
         <ul class="navbar-nav">
           {% if user.is_authenticated %}
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle text-light" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                {{ user.username }}
-              </a>
-              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item" href="{% url 'account:password_change' %}">Change Password</a></li>
-                <li><a class="dropdown-item" href="{% url 'account:view_profile' %}">View Profile</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="{% url 'account:logout' %}">Log out</a></li>
-              </ul>
+            <li class="nav-item">
+              <a class="nav-link text-light" href="{% url 'account:view_profile' %}">Welcome, {{ user.username }}</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-light" href="{% url 'account:change_password' %}">Change Password</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-light" href="{% url 'account:logout' %}">Log out</a>
             </li>
           {% else %}
             <li class="nav-item">
@@ -73,11 +71,7 @@
     {% block content %}
     {% endblock %}
 </div>
-<script>
-  $(document).ready(function() {
-    $('.dropdown-toggle').dropdown();
-  });
-</script>
+
 
 <!-- Footer -->
 <footer class="bg-light text-center py-3">
@@ -90,16 +84,16 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.3/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/5.0.0/js/bootstrap.min.js"></script>
 
-<!-- Bootstrap JavaScript and jQuery dependencies -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.3/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/5.0.0/js/bootstrap.min.js"></script>
-
 <!-- Initialize the Bootstrap dropdown component -->
 <script>
   $(document).ready(function() {
     $('.dropdown-toggle').dropdown();
   });
+  var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'))
+  var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+    return new bootstrap.Dropdown(dropdownToggleEl)
+  })
 </script>
+
 </body>
 </html>

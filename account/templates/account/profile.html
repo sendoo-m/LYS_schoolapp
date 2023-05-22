@@ -4,12 +4,16 @@
 {% block title %}{{ user.username }} - Profile{% endblock %}
 
 {% block content %}
-
-<h1>Profile</h1>
-<p>Username: {{ user.username }}</p>
-<p>Email: {{ user.email }}</p>
-<p>Date of Enrollment: {{ user.date_of_enrollment }}</p>
-<p>National ID: {{ user.national_id }}</p>
-<p>Department: {{ user.get_department_display }}</p>
-<!-- Add more fields as needed -->
+<div class="card mt-4">
+  <div class="card-body">
+    <h1 class="card-title">Profile</h1>
+    <p class="card-text">Username: {{ user.username }}</p>
+    <p class="card-text">Email: {{ user.email }}</p>
+    <p class="card-text">Date of Enrollment: {{ user.date_of_enrollment }}</p>
+    <p class="card-text">National ID: {{ user.national_id }}</p>
+    <p class="card-text">Department: {{ user.get_department_display }}</p>
+    <a href="{% url 'account:change_password' %}" class="btn btn-primary">Change Password</a>
+    <!-- Add more fields as needed -->
+  </div>
+</div>
 {% endblock content %}

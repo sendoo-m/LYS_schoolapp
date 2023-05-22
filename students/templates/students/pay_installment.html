@@ -8,11 +8,11 @@
     <p>Student Name: {{ student_name }}</p>  <!-- Display the student's name -->
     <p>National Number: {{ national_number }}</p>  <!-- Display the student's national number -->
 
-    {% if messages %}
+    {% comment %} {% if messages %}
     {% for message in messages %}
       <div class="alert alert-{{ message.tags }}">{{ message }}</div>
     {% endfor %}
-  {% endif %}
+  {% endif %} {% endcomment %}
     
     <form method="post">
         {% csrf_token %}

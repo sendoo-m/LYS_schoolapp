@@ -97,11 +97,22 @@
                     <tr>
                         <th>Amount Paid:</th>
                         <td>{{ tuition.amount }}</td>
-                    </tr>
-                    <tr>
-                        <th>User:</th>
-                        <td>{{ user.username }}</td>
-                    </tr>
+                       
+                                </tr>
+                                <tr>
+                                    <th>Amount Remaining:</th>
+                                    <td>
+                                        {% if total_owed > 0 %}
+                                            {{ total_owed }}
+                                        {% elif total_owed < 0 %}
+                                            Paid over
+                                            {{ total_owed }}<!--|absolute -->
+                                        {% else %}
+                                            0
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </tbody>
                 </tbody>
             </table>
             <button class="btn btn-primary print-button" onclick="printReceipt()">Print</button>

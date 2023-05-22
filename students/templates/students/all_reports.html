@@ -1,0 +1,37 @@
+{% extends 'students/base.html' %}
+
+{% block content %}
+  <h1>All Reports</h1>
+
+  <h2>Stage Statistics</h2>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Stage</th>
+        <th>Total Students</th>
+        <th>Total Tuitions</th>
+        <th>Total Paid Tuitions</th>
+        <th>Total Unpaid Students</th>
+        <th>Remaining Tuitions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for stage_stat in stage_stats %}
+        <tr>
+          <td>{{ stage_stat.stage }}</td>
+          <td>{{ stage_stat.total_stage_students }}</td>
+          <td>{{ stage_stat.total_stage_tuitions }}</td>
+          <td>{{ stage_stat.paid_stage_tuitions }}</td>
+          <td>{{ stage_stat.unpaid_stage_students }}</td>
+          <td>
+            {% if stage_stat.remaining_stage_tuitions > 0 %}
+              {{ stage_stat.remaining_stage_tuitions }}
+            {% else %}
+              0
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
