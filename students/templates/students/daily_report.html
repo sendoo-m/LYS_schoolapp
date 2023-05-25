@@ -24,4 +24,23 @@
   {% else %}
     <p>No expenses found for this student.</p>
   {% endif %}
+
+
+  <h1>Daily Report - {{ report_date }}</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Payment Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in paid_students %}
+                <tr>
+                    <td>{{ student.name }}</td>
+                    <td>{{ student.payment_date }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

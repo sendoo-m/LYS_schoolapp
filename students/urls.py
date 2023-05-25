@@ -14,6 +14,7 @@ urlpatterns = [
     path('pay_installment/<int:pk>/', views.pay_installment, name='pay_installment'),
     path('receipt/<int:pk>/', views.receipt, name='receipt'),
     path('report/', views.report, name='report'),
+    path('daily_report/', views.generate_daily_report, name='daily_report'),
     path('all_reports/', views.all_reports, name='all_reports'),
     path('search/', views.search_student, name='search_student'),
 ]

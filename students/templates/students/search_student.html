@@ -23,6 +23,7 @@
               <th>National Number</th>
               {% comment %} <th>Status</th> {% endcomment %}
               <th>Age</th>
+              <th>class </th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -43,6 +44,7 @@
                   {% endif %}
               </td><!-- نهاية علامة الدفع بالالوان --> {% endcomment %}
                 <td>{{ student.age }}</td>
+                <td>{{ student.classroom_stage }}</td>
                 <td>
                   {% comment %} <a href="{% url 'students:edit_student' pk=student.pk %}" class="btn btn-primary btn-sm">Edit</a> {% endcomment %}
                   <a href="{% url 'students:student_detail' pk=student.pk %}" class="btn btn-primary btn-sm">View Installments</a>

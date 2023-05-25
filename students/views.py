@@ -9,13 +9,7 @@ from django.views.decorators.cache import never_cache
 from django.db.models import Q
 
 
-
-
 # Create your views here.
-
-# def home(request):
-#     return render(request, '/students/home.html')
-
 
 def home(request):
     students = Student.objects.all()
@@ -33,7 +27,7 @@ def home(request):
 @login_required
 def search_student(request):
     query = request.GET.get('query')
-    students = Student.objects.all()
+    students = Student.objects.all().order_by('name')
 
     if query and query.strip():
         students = students.filter(Q(name__icontains=query) | Q(national_number__icontains=query))
@@ -100,33 +94,6 @@ def delete_student(request, student_id):
         'student': student,
     }
     return render(request, 'students/delete_student.html', context)
-
-
-# @login_required
-# def register(request):
-#     if request.method == 'POST':
-#         academic_year_form = AcademicYearForm(request.POST)
-#         educational_stage_form = EducationalStageForm(request.POST)
-#         classroom_form = ClassroomForm(request.POST)
-#         if academic_year_form.is_valid() and educational_stage_form.is_valid() and classroom_form.is_valid():
-#             academic_year = academic_year_form.save()
-#             educational_stage = educational_stage_form.save()
-#             classroom = classroom_form.save(commit=False)
-#             classroom.educational_stage = educational_stage
-#             classroom.academic_year = academic_year
-#             classroom.save()
-#             messages.success(request, 'Registration successful!')
-#             return redirect('register')
-#     else:
-#         academic_year_form = AcademicYearForm()
-#         educational_stage_form = EducationalStageForm()
-#         classroom_form = ClassroomForm()
-#     context = {
-#         'academic_year_form': academic_year_form,
-#         'educational_stage_form': educational_stage_form,
-#         'classroom_form': classroom_form,
-#     }
-#     return render(request, 'students/register.html', context)
 
 
 @never_cache
@@ -322,30 +289,151 @@ def report(request):
     return render(request, 'students/report.html', context)
 
 
-def all_reports(request):
-    stages = Classroom.objects.all()
-    stage_stats = []
+
+from django.db.models import Sum
+# كود يعمل بنفس المشكلة
+# def all_reports(request):
+#     stages = Classroom.objects.all()
+#     stage_stats = []
+
+#     for stage in stages:
+#         stage_students = Student.objects.filter(classroom=stage)
+#         total_stage_students = stage_students.count()
+
+#         paid_stage_tuitions = Tuition.objects.filter(student__in=stage_students, paid=True).aggregate(Sum('amount'))['amount__sum'] or 0
+#         unpaid_stage_students = stage_students.exclude(installments__paid=True).count()
+#         total_stage_tuitions = stage_students.aggregate(Sum('installments__amount'))['installments__amount__sum'] or 0
+
+#         total_stage_expenses = Expense.objects.filter(classroom=stage).aggregate(Sum('amount'))['amount__sum'] or 0
+
+#         remaining_stage_tuitions = total_stage_tuitions - paid_stage_tuitions
+#         # remaining_stage_expenses = total_stage_expenses 
+#         remaining_stage_expenses = total_stage_expenses   # تعديل سندوو
+
+#         stage_stats.append({
+#             'stage': stage,
+#             'total_stage_students': total_stage_students,
+#             'total_stage_tuitions': total_stage_tuitions,
+#             'paid_stage_tuitions': paid_stage_tuitions,
+#             'unpaid_stage_students': unpaid_stage_students,
+#             'remaining_stage_tuitions': remaining_stage_tuitions,
+#             'total_stage_expenses': total_stage_expenses,
+#             'remaining_stage_expenses': remaining_stage_expenses,
+#             # 'total_remaining_fees': remaining_stage_tuitions - paid_stage_tuitions + remaining_stage_expenses, # محتاج اظبط عملية الطرح
+#             'total_remaining_fees': remaining_stage_expenses - unpaid_stage_students, # تعديل سندوو
+#         })
+
+#     context = {
+#         'stage_stats': stage_stats,
+#     }
+
+#     return render(request, 'students/all_reports.html', context) # نهاية الكود الذي يعمل بنفس المشكله
+from django.shortcuts import render
+from django.db.models import Sum
+from .models import Classroom, Tuition, Student
+
+
+from django.shortcuts import render
+from django.db.models import Sum, Count
+from .models import Classroom, Tuition, Student
+
+from django.db.models import Sum
+
+from django.db.models import Sum
+
+# def all_reports(request): الكود يعمل ولكن رقمين فقط لا يظهروا
+#     # Overall statistics
+#     total_students = Student.objects.count()
+#     total_installments_paid = Tuition.objects.filter(paid=True).count()
+#     total_fees_due = Tuition.objects.aggregate(total=Sum('amount'))['total'] or 0
+#     paid_students = Student.objects.filter(installments__paid=True).distinct().count()
+#     unpaid_students = Student.objects.filter(installments__paid=False).distinct().count()
+#     total_fees_paid = Tuition.objects.filter(paid=True).aggregate(total=Sum('amount'))['total'] or 0
+#     total_remaining = total_fees_due - total_fees_paid
     
-    for stage in stages:
-        stage_students = Student.objects.filter(classroom=stage)
-        total_stage_students = stage_students.count()
+#     classroom_stats = []  # Define an empty list to hold the classroom statistics
+    
+#     for classroom in Classroom.objects.all():
+#         classroom_students = classroom.student_set.count()
+#         classroom_fees_due = Tuition.objects.filter(student__classroom=classroom).aggregate(total=Sum('amount'))['total'] or 0
+#         total_paid_students = classroom.student_set.filter(installments__paid=True).count()
+#         total_unpaid_students = classroom.student_set.filter(installments__paid=False).count()
+#         remaining_tuitions = classroom_fees_due - (Tuition.objects.filter(student__classroom=classroom, paid=True).aggregate(total=Sum('amount')).get('total') or 0)
+#         classroom_stat = {
+#             'classroom': classroom.name,
+#             'total_students': classroom_students,
+#             'total_fees_due': classroom_fees_due,
+#             'total_paid_students': total_paid_students,
+#             'total_unpaid_students': total_unpaid_students,
+#             'remaining_tuitions': remaining_tuitions,
+#         }
+#         classroom_stats.append(classroom_stat)
+
+#     context = {
+#         'total_students': total_students,
+#         'total_installments_paid': total_installments_paid,
+#         'total_fees_due': total_fees_due,
+#         'paid_students': paid_students,
+#         'unpaid_students': unpaid_students,
+#         'total_remaining': total_remaining,
+#         'classroom_stats': classroom_stats,
+#     }
+#     return render(request, 'students/all_reports.html', context)
+
+
+
+from django.db.models import Sum, F, ExpressionWrapper, DecimalField
+
+from django.db.models import Sum, Case, When, F, IntegerField
+
+def all_reports(request):
+    # Overall statistics
+    total_students = Student.objects.count()
+    total_installments_paid = Tuition.objects.filter(paid=True).count()
+    total_fees_due = Tuition.objects.aggregate(total=Sum('amount'))['total'] or 0
+    paid_students = Student.objects.filter(installments__paid=True).distinct().count()
+    total_fees_paid = Tuition.objects.filter(paid=True).aggregate(total=Sum('amount'))['total'] or 0
+    total_remaining = total_fees_due - total_fees_paid
+
+    classroom_stats = []  # Define an empty list to hold the classroom statistics
+    
+    for classroom in Classroom.objects.all():
+        classroom_students = classroom.student_set.count()
         
-        paid_stage_tuitions = Tuition.objects.filter(student__in=stage_students, paid=True).aggregate(Sum('amount'))['amount__sum'] or 0
-        unpaid_stage_students = stage_students.exclude(installments__paid=True).count()
-        total_stage_tuitions = stage_students.aggregate(Sum('installments__amount'))['installments__amount__sum'] or 0
+        classroom_fees_due = Tuition.objects.filter(student__classroom=classroom).aggregate(total=Sum('amount'))['total'] or 0
+        classroom_fees_paid = Tuition.objects.filter(student__classroom=classroom, paid=True).aggregate(total=Sum('amount'))['total'] or 0
+        remaining_tuitions = classroom_fees_due - classroom_fees_paid
         
-        stage_stats.append({
-            'stage': stage,
-            'total_stage_students': total_stage_students,
-            'total_stage_tuitions': total_stage_tuitions,
-            'paid_stage_tuitions': paid_stage_tuitions,
-            'unpaid_stage_students': unpaid_stage_students,
-            'remaining_stage_tuitions': total_stage_tuitions - paid_stage_tuitions,
-        })
+        total_paid_students = classroom.student_set.filter(installments__paid=True).count()
+        total_unpaid_students = classroom_students - total_paid_students
+        
+        classroom_stat = {
+            'classroom': classroom.name,
+            'total_students': classroom_students,
+            'total_fees_due': classroom_fees_due,
+            'total_paid_students': total_paid_students,
+            'total_unpaid_students': total_unpaid_students,
+            'remaining_tuitions': remaining_tuitions,
+        }
+        classroom_stats.append(classroom_stat)
 
     context = {
-        'stage_stats': stage_stats,
+        'total_students': total_students,
+        'total_installments_paid': total_installments_paid,
+        'total_fees_due': total_fees_due,
+        'paid_students': paid_students,
+        'unpaid_students': total_students - paid_students,
+        'total_remaining': total_remaining,
+        'classroom_stats': classroom_stats,
     }
-
     return render(request, 'students/all_reports.html', context)
 
+
+
+from django.shortcuts import render
+from datetime import date
+
+def generate_daily_report(request):
+    report_date = date.today()
+    paid_students = Student.objects.filter(installments__paid=True, installments__receipt_date=report_date)
+    return render(request, 'students/daily_report.html', {'report_date': report_date, 'paid_students': paid_students})

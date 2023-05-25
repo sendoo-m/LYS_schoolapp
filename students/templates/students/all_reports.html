@@ -1,6 +1,104 @@
 {% extends 'students/base.html' %}
 
 {% block content %}
+<h1>All Reports</h1>
+    
+<div class="container">
+    <h2>Overall Statistics</h2>
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <div class="card border-primary">
+          <div class="card-header">Total Students</div>
+          <div class="card-body text-primary">
+            <h5 class="card-title">{{ total_students }}</h5>
+            <p class="card-text">Total number of students enrolled.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="card border-secondary">
+          <div class="card-header">Total Installments Paid</div>
+          <div class="card-body text-secondary">
+            <h5 class="card-title">{{ total_installments_paid }}</h5>
+            <p class="card-text">Total number of installments paid by students.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="card border-success">
+          <div class="card-header">Total Fees Due</div>
+          <div class="card-body text-success">
+            <h5 class="card-title">{{ total_fees_due }}</h5>
+            <p class="card-text">Total fees due from all students.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="card border-danger">
+          <div class="card-header">Paid Students</div>
+          <div class="card-body text-danger">
+            <h5 class="card-title">{{ paid_students }}</h5>
+            <p class="card-text">Total number of students who have paid their fees.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="card border-warning">
+          <div class="card-header">Unpaid Students</div>
+          <div class="card-body">
+            <h5 class="card-title">{{ unpaid_students }}</h5>
+            <p class="card-text">Total number of students who have not paid their fees.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="card border-info">
+          <div class="card-header">Total Remaining</div>
+          <div class="card-body">
+            <h5 class="card-title">{{ total_remaining }}</h5>
+            <p class="card-text">Total remaining fees to be paid by students.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+  ==================================================================================================
+
+  <div class="container">
+    <h2>Student Statistics</h2>
+    <div class="row">
+      <div class="col-md-12">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Classroom</th>
+              <th>Total Students</th>
+              <th>Total Fees Due</th>
+              <th>Paid Students</th>
+              <th>Unpaid Students</th>
+              <th>Remaining Tuitions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for classroom_stat in classroom_stats %}
+          <tr>
+              <td>{{ classroom_stat.classroom }}</td>
+              <td>{{ classroom_stat.total_students }}</td>
+              <td>{{ classroom_stat.total_fees_due }}</td>
+              <td>{{ classroom_stat.total_paid_students }}</td>
+              <td>{{ classroom_stat.total_unpaid_students }}</td>
+              <td><strong>{{ classroom_stat.remaining_tuitions }}</strong></td>
+          </tr>
+          {% endfor %}
+      </tbody>
+  </table>
+  
+{% endblock %}
+
+
+{% comment %} {% extends 'students/base.html' %}
+{% block content %}
   <h1>All Reports</h1>
 
   <h2>Stage Statistics</h2>
@@ -24,14 +122,20 @@
           <td>{{ stage_stat.paid_stage_tuitions }}</td>
           <td>{{ stage_stat.unpaid_stage_students }}</td>
           <td>
-            {% if stage_stat.remaining_stage_tuitions > 0 %}
-              {{ stage_stat.remaining_stage_tuitions }}
-            {% else %}
-              0
-            {% endif %}
-          </td>
+            <strong>
+                {% if stage_stat.remaining_stage_tuitions > 0 or stage_stat.remaining_stage_expenses > 0 %}
+                    {{ stage_stat.total_remaining_fees }}
+                {% elif stage_stat.remaining_stage_tuitions < 0 or stage_stat.remaining_stage_expenses < 0 %}
+                    Paid over {{ stage_stat.total_remaining_fees }}
+                {% else %}
+                    0
+                {% endif %}
+            </strong>
+        </td>
+        
+          
         </tr>
       {% endfor %}
     </tbody>
   </table>
-{% endblock %}
+{% endblock %} {% endcomment %}
