@@ -346,67 +346,6 @@ def report(request):
 
 
 
-# work nicly with one error in report
-from django.db.models import Sum
-from django.shortcuts import render
-from django.utils import timezone
-from .models import Student, Tuition, Classroom
-
-# work nicly with one error in report
-
-# def all_reports(request):
-#     # Overall statistics
-#     total_students = Student.objects.count()
-#     total_installments_paid = Tuition.objects.filter(paid=True).count()
-#     total_fees_due = Student.objects.aggregate(total_payments=Sum('total_payments'))['total_payments'] or 0
-#     total_fees_due *= total_students
-#     paid_students = Student.objects.filter(tuitions__paid=True).distinct().count()
-#     total_fees_paid = Tuition.objects.filter(paid=True).aggregate(total=Sum('amount_tuition'))['total'] or 0
-    
-    
-#     classroom_stats = []
-#     classrooms = Classroom.objects.all()
-#     for classroom in classrooms:
-#         total_students_classroom = classroom.student_set.count()
-#         total_fees_due_classroom = classroom.student_set.aggregate(total_payments=Sum('total_payments'))['total_payments'] or 0
-#         total_paid_students = classroom.student_set.filter(tuitions__paid=True).count()
-#         total_unpaid_students = 0  # Set total_unpaid_students initially to 0
-
-#         # Update total_unpaid_students if there are unpaid students
-#         if total_paid_students < total_students_classroom:
-#             total_unpaid_students = total_students_classroom - total_paid_students
-
-#         total_remaining_tuitions = (Expense.objects.filter(classroom=classroom).aggregate(total_expense=Sum('amount'))['total_expense'] or 0) * total_students_classroom
-#         total_remaining_tuitions -= total_fees_due_classroom
-
-    
-
-#         classroom_stat = {
-#             'classroom': classroom,
-#             'total_students': total_students_classroom,
-#             'total_fees_due': total_fees_due_classroom,
-#             'total_paid_students': total_paid_students,
-#             'total_unpaid_students': total_unpaid_students,
-#             'remaining_tuitions': total_remaining_tuitions,
-#         }
-#         classroom_stats.append(classroom_stat)
-
-#     # Calculate total_remaining
-#     total_Expense = (Expense.objects.aggregate(total=Sum('amount'))['total'] or 0) * total_students_classroom
-#     total_Student = (Student.objects.aggregate(total=Sum('total_payments'))['total'] or 0) * total_students_classroom
-#     total_remaining = total_Expense - total_Student
-
-#     context = {
-#         'total_students': total_students,
-#         'total_installments_paid': total_installments_paid,
-#         'total_fees_due': total_fees_due,
-#         'paid_students': paid_students,
-#         'unpaid_students': total_students - paid_students,
-#         'total_remaining': total_remaining,
-#         'classroom_stats': classroom_stats,
-#     }
-
-#     return render(request, 'students/all_reports.html', context)
 def all_reports(request):
     # Overall statistics
     total_students = Student.objects.count()
