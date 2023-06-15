@@ -1,0 +1,31 @@
+{% extends 'students/base.html' %}
+
+{% block title %}Installment Report{% endblock %}
+
+{% block content %}
+    <h1>Installment Report</h1>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Installment Number</th>
+                    <th>Amount</th>
+                    <th>Paid</th>
+                    <th>Receipt Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for installment in installments %}
+                    <tr>
+                        <td>{{ installment.student.name }}</td>
+                        <td>{{ installment.installment_number }}</td>
+                        <td>{{ installment.amount }}</td>
+                        <td>{{ installment.paid }}</td>
+                        <td>{{ installment.receipt_date }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

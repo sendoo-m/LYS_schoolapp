@@ -54,7 +54,7 @@
                 <tr>
                     <td>{{ installment.installment_number }}</td>
                     <td>{{ installment.receipt_date }}</td>
-                    <td>{{ installment.amount }}</td>
+                    <td>{{ installment.amount_tuition }}</td>
                     <td>
                     {% if installment.paid %}
                         Yes
@@ -76,6 +76,10 @@
                     <td>{{ user.username }}</td>
                     <td>
                         <a href="{% url 'students:receipt' pk=installment.pk %}" class="btn btn-secondary btn-sm">إيصال القسط</a>
+                        <form method="POST" action="{% url 'students:delete_installment' pk=installment.pk %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this installment?')">Delete</button>
+                        </form>
                     </td>
                 </tr>
             {% endfor %}
@@ -97,30 +101,14 @@
                     {{ total_owed }}
                 {% elif total_owed < 0 %}
                     Paid over
-                    {{ total_owed }}<!--|abs-->
+                    {{ total_owed }}<!--|abs--> 
                 {% else %}
                     0
                 {% endif %}
                 </strong>
                 </td>
             </tr>
-            {% comment %} {% if expenses %}
-            <tr>
-                <td colspan="6"><h2>Expenses</h2></td>
-            </tr>
-            <tr>
-                <th>Type</th>
-                <th>Amount</th>
-                <th>Date</th>
-            </tr>
-            {% for expense in expenses %}
-                <tr>
-                    <td>{{ expense.expense_type }}</td>
-                    <td>{{ expense.amount }}</td>
-                    <td>{{ expense.date }}</td>
-                </tr>
-            {% endfor %}
-            {% endif %} {% endcomment %}
+           
         </tbody>
     </table>
     <button class="btn btn-primary print-button" onclick="printReceipt()">طباعة حساب الطالب</button>
@@ -131,52 +119,3 @@
     </script>
     {% endblock %}
 
-{% comment %} {% extends 'students/base.html' %} --> 
-{% load crispy_forms_tags %}
-
-{% block title %}{{ student.name }} - Student Detail{% endblock %}
-
-{% block content %}
-    <h1>{{ student.name }} - Installment Payments</h1>
-    {% if messages %}
-    {% for message in messages %}
-      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-  {% endif %}
-    <a href="{% url 'students:pay_installment' pk=student.pk %}" class="btn btn-primary btn-sm">Pay Installments</a>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Receipt Number</th>
-                <th>Receipt Date</th>
-                <th>Amount</th>
-                <th>Paid</th>
-                <th>Payer</th>  <!-- Add the Payer column -->
-                <th>Receipt</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for installment in installments %}
-                <tr>
-                    <td>{{ installment.installment_number }}</td>
-                    <td>{{ installment.receipt_date }}</td>
-                    <td>{{ installment.amount }}</td>
-                    <td>{{ installment.paid }}</td>
-                    <td>{{ user.username }}</td>  <!-- Display the username of the payer -->
-                    {% comment %} <td> chat GPT
-                        {% if installment.paid %}
-                        <a href="{% url 'students:receipt' pk=installment.pk %}" class="btn btn-primary btn-sm">View Receipt</a>
-                        {% endif %}
-                    </td> {% endcomment %}{% comment %}
-                    <td>
-                        <a href="{% url 'students:receipt' pk=installment.pk %}" class="btn btn-secondary btn-sm">View Receipt</a>
-                    </td>  <!-- Add the button column -->
-                </tr>
-            {% endfor %}
-            <tr>
-                <td colspan="2"><strong>Total Paid:</strong></td>
-                <td colspan="4"><strong>{{ total_paid }}</strong></td>
-            </tr>
-        </tbody>
-    </table>
-{% endblock %} -->{% endcomment %}

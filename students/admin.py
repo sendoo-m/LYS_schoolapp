@@ -49,6 +49,6 @@ class ExpenseAdmin(admin.ModelAdmin):
 
 @admin.register(Tuition)
 class TuitionAdmin(admin.ModelAdmin):
-    list_display = ('student', 'installment_number', 'amount', 'receipt_date')
+    list_display = ('student', 'installment_number', 'amount_tuition', 'receipt_date')
     list_filter = ('student__classroom__educational_stage', )
     search_fields = ('student__name',)

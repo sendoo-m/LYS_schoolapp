@@ -1,9 +1,9 @@
 {% extends 'students/base.html' %}
 
 {% block content %}
-<h1>All Reports</h1>
+  <h1>All Reports</h1>
     
-<div class="container">
+  <div class="container">
     <h2>Overall Statistics</h2>
     <div class="row">
       <div class="col-md-4 mb-3">
@@ -63,8 +63,6 @@
     </div>
   </div>
  
-  ==================================================================================================
-
   <div class="container">
     <h2>Student Statistics</h2>
     <div class="row">
@@ -82,19 +80,34 @@
           </thead>
           <tbody>
             {% for classroom_stat in classroom_stats %}
-          <tr>
-              <td>{{ classroom_stat.classroom }}</td>
-              <td>{{ classroom_stat.total_students }}</td>
-              <td>{{ classroom_stat.total_fees_due }}</td>
-              <td>{{ classroom_stat.total_paid_students }}</td>
-              <td>{{ classroom_stat.total_unpaid_students }}</td>
-              <td><strong>{{ classroom_stat.remaining_tuitions }}</strong></td>
-          </tr>
-          {% endfor %}
-      </tbody>
-  </table>
-  
+              <tr>
+                <td>
+                  <!-- Link to classroom details -->
+                  <a href="{% url 'students:classroom_details' classroom_stat.classroom.id %}">
+                    {{ classroom_stat.classroom }}
+                  </a>
+                </td>
+                
+                <td>{{ classroom_stat.total_students }}</td>
+                <td>{{ classroom_stat.total_fees_due }}</td>
+                <td>{{ classroom_stat.total_paid_students }}</td>
+                <td>
+                  {% if classroom_stat.unpaid_students_link %}
+                    <a href="{{ classroom_stat.unpaid_students_link }}">{{ classroom_stat.total_unpaid_students }}</a>
+                  {% else %}
+                    {{ classroom_stat.total_unpaid_students }}
+                  {% endif %}
+                </td>
+                <td><strong>{{ classroom_stat.remaining_tuitions }}</strong></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table> 
+      </div>
+    </div>
+  </div>
 {% endblock %}
+
 
 
 {% comment %} {% extends 'students/base.html' %}

@@ -84,7 +84,7 @@
                 <tbody>
                     <tr>
                         <th>Payment Date:</th>
-                        <td>{{ tuition.receipt_date|date:"F d, Y" }}</td>
+                        <td>{{ tuition.receipt_date|date:"F d, Y" }} {{ tuition.receipt_date|time:"h:i A" }}</td>
                     </tr>
                     <tr>
                         <th>Student Name:</th>
@@ -96,7 +96,7 @@
                     </tr>
                     <tr>
                         <th>Amount Paid:</th>
-                        <td>{{ tuition.amount }}</td>
+                        <td>{{ tuition.amount_tuition }}</td>
                        
                                 </tr>
                                 <tr>

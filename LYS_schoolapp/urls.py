@@ -19,6 +19,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from students import urls as students_urls
+from report import urls as report_urls
 from account import urls as account_urls
 
 from django.views.generic.base import RedirectView
@@ -27,5 +28,6 @@ urlpatterns = [
     path('', RedirectView.as_view(url='students/')),  # Redirect to students app
     path('admin/', admin.site.urls),
     path('students/', include(students_urls)),
+    path('report/', include(report_urls)),
     path('', include(account_urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

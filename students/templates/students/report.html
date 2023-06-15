@@ -14,7 +14,7 @@
                 <p class="mb-0">Total number of students who did not pay: {{ total_unpaid_students }}</p>
                 <p class="mb-0">Total male students: {{ total_male_students }}</p>
                 <p class="mb-0">Total female students: {{ total_female_students }}</p>
-                <p class="mb-0">Total tuition: {{ total_tuition }}</p>
+                <p class="mb-0">Total tuition: {{ total_tuitions }}</p>
             </div>
         </div>
         <div class="col-md-6">
@@ -28,38 +28,37 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% comment %} {% for stage, count in stages %} {% endcomment %}
-                            <tr class="{% cycle 'table-secondry' 'table-White' %}">
-                                <td>{% comment %} {{ stage }} {% endcomment %}</td>
-                                <td>{% comment %}{{ count }}{% endcomment %}</td>
+                        {% for stage_stat in stage_stats %}
+                            <tr class="{% cycle 'table-secondary' 'table-white' %}">
+                                <td>{{ stage_stat.stage.name }}</td>
+                                <td>{{ stage_stat.total_stage_students }}</td>
                             </tr>
-                        {% comment %} {% endfor %} {% endcomment %}
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+    <h2>Expenses by Educational Stage</h2>
+    <form method="GET">
+        <label for="stage_id">Select an Educational Stage:</label>
+        <select id="stage_id" name="stage_id">
+            {% for stage in stages %}
+                <option value="{{ stage.id }}">{{ stage.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Get Report</button>
+    </form>
 
+    {% if expenses %}
+        <h3>Expenses for {{ selected_stage.name }}</h3>
+        <ul>
+            {% for expense in expenses %}
+                <li>{{ expense.description }} - ${{ expense.amount }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No expenses found for this educational stage.</p>
+    {% endif %}
 
-    <h1>Expenses by Educational Stage</h1>
-  <form method="GET">
-    <label for="stage_id">Select an Educational Stage:</label>
-    <select id="stage_id" name="stage_id">
-      {% for stage in educational_stages %}
-        <option value="{{ stage.id }}">{{ stage.name }}</option>
-      {% endfor %}
-    </select>
-    <button type="submit">Get Report</button>
-  </form>
-
-  {% if expenses %}
-    <h2>Expenses for {{ stage.name }}</h2>
-    <ul>
-      {% for expense in expenses %}
-        <li>{{ expense.description }} - ${{ expense.amount }}</li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>No expenses found for this educational stage.</p>
-  {% endif %}
 {% endblock %}

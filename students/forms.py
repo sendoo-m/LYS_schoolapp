@@ -26,13 +26,25 @@ class ExpenseForm(forms.ModelForm):
             'date': forms.DateInput(attrs={'type': 'date'})
         }
 
+# class TuitionForm(forms.ModelForm):
+#     class Meta:
+#         model = Tuition
+#         fields = ['installment_number', 'amount_tuition']
+
+from django import forms
+from .models import Tuition
+
 class TuitionForm(forms.ModelForm):
     class Meta:
         model = Tuition
-        fields = ['installment_number', 'amount', 'receipt_date']
-        widgets = {
-            'receipt_date': forms.DateInput(attrs={'type': 'date'}),
-        }
+        fields = ['installment_number', 'amount_tuition']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        instance = getattr(self, 'instance', None)
+        if instance and instance.pk:
+            self.fields['receipt_date'].disabled = True
+
 
 
 class SignUpForm(UserCreationForm):

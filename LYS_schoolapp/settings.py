@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-m@j5%!iwq4p@)oj0_*$wn0)v4wfoy7@gf=r#)naezp$2pzw+e&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'account',
     'students',
+    'report',
     'django_extensions',
     'crispy_forms',
     'crispy_bootstrap5',
@@ -112,11 +113,11 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Cairo'
 
 USE_I18N = True
 
-USE_TZ = True
+# USE_TZ = True
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
