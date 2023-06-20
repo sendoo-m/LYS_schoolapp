@@ -53,7 +53,7 @@
             {% for installment in installments %}
                 <tr>
                     <td>{{ installment.installment_number }}</td>
-                    <td>{{ installment.receipt_date }}</td>
+                    <td>{{ installment.receipt_date|date:"F d, Y" }} {{ installment.receipt_date|time:"h:i A" }}</td>
                     <td>{{ installment.amount_tuition }}</td>
                     <td>
                     {% if installment.paid %}
@@ -76,10 +76,10 @@
                     <td>{{ user.username }}</td>
                     <td>
                         <a href="{% url 'students:receipt' pk=installment.pk %}" class="btn btn-secondary btn-sm">إيصال القسط</a>
-                        <form method="POST" action="{% url 'students:delete_installment' pk=installment.pk %}" style="display: inline;">
+                        {% comment %}<form method="POST" action="{% url 'students:delete_installment' pk=installment.pk %}" style="display: inline;">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this installment?')">Delete</button>
-                        </form>
+                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this installment?')">Delete</button> 
+                        </form>{% endcomment %}
                     </td>
                 </tr>
             {% endfor %}
@@ -96,7 +96,7 @@
             <tr>
                 <td colspan="2"><strong>Total Owed:</strong></td>
                 <td colspan="4">
-                <strong>
+                    <strong style="color: {% if total_owed > 0 %}red{% elif total_owed < 0 %}green{% else %}green{% endif %}">
                 {% if total_owed > 0 %}
                     {{ total_owed }}
                 {% elif total_owed < 0 %}

@@ -1,5 +1,5 @@
 {% extends 'students/base.html' %}
-
+{% block title %}Classroom Details - {{ classroom.name }}{% endblock %}
 {% block content %}
   <h1>Classroom Details - {{ classroom.name }}</h1>
     
@@ -33,12 +33,12 @@
             <td>{{ student.total_payments }}</td>
             <td>{{ total_expenses }}</td>
             <td>
-              <strong>
-                {% if student.total_owed > 0 %}
-                  {{ student.total_owed }}
-                {% elif student.total_owed < 0 %}
+              <strong style="color: {% if total_owed > 0 %}red{% elif total_owed < 0 %}green{% else %}green{% endif %}">
+                {% if total_owed > 0 %}
+                  {{ total_owed }}
+                {% elif total_owed < 0 %}
                   Paid over
-                  {{ student.total_owed }}<!--|abs--> 
+                  {{ total_owed }}<!--|abs--> 
                 {% else %}
                   0
                 {% endif %}

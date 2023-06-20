@@ -461,13 +461,52 @@ def all_reports(request):
 
 
 # get total from student table its good work
+
+
+# def classroom_details(request, classroom_id):
+    
+#     classroom = Classroom.objects.get(id=classroom_id)
+
+#     # Calculate total expenses for the classroom
+#     total_expenses = Expense.objects.filter(classroom=classroom).aggregate(total_expenses=Sum('amount'))['total_expenses'] or 0
+
+#     # Get the search query from the request
+#     search_query = request.GET.get('search')
+
+#     # Filter students based on the search query
+#     if search_query:
+#         students = classroom.student_set.filter(Q(name__icontains=search_query) | Q(national_number__icontains=search_query))
+#     else:
+#         students = classroom.student_set.all()
+
+#     # Paginate the students
+#     paginator = Paginator(students, 10)
+#     page_number = request.GET.get('page')
+#     page_obj = paginator.get_page(page_number)
+
+#     context = {
+#         'classroom': classroom,
+#         'page_obj': page_obj,
+#         'search_query': search_query,
+#         'total_expenses': total_expenses,
+#     }
+
+#     return render(request, 'students/classroom_details.html', context)
+
+from django.db.models import Sum
+
 from django.db.models import Sum
 
 def classroom_details(request, classroom_id):
     classroom = Classroom.objects.get(id=classroom_id)
+    expenses = Expense.objects.filter(classroom=classroom)
+    total_expenses = expenses.aggregate(total_expenses=Sum('amount'))['total_expenses'] or 0
 
-    # Calculate total expenses for the classroom
-    total_expenses = Expense.objects.filter(classroom=classroom).aggregate(total_expenses=Sum('amount'))['total_expenses'] or 0
+    # Calculate total paid for the classroom
+    total_paid = Tuition.objects.filter(student__classroom=classroom, paid=True).aggregate(total=Sum('amount_tuition'))['total'] or 0
+
+    # Calculate total owed for the classroom
+    total_owed = total_expenses - total_paid
 
     # Get the search query from the request
     search_query = request.GET.get('search')
@@ -488,9 +527,13 @@ def classroom_details(request, classroom_id):
         'page_obj': page_obj,
         'search_query': search_query,
         'total_expenses': total_expenses,
+        'total_owed': total_owed,
+        'total_paid': total_paid,
     }
 
     return render(request, 'students/classroom_details.html', context)
+
+
 
 
 
@@ -498,20 +541,6 @@ def g_reports(request):
     # Implement your view logic here
     return render(request, 'students/g_reports.html')
 
-
-# def generate_daily_report(request):
-#     report_date = date.today()
-#     daily_payments = Tuition.objects.filter(paid=True, receipt_date__date=report_date).values('receipt_date__date').annotate(total_amount=Sum('amount_tuition')).order_by('-receipt_date__date')
-
-#     paginator = Paginator(daily_payments, 10)  # Show 10 payments per page
-#     page_number = request.GET.get('page')
-#     page_obj = paginator.get_page(page_number)
-
-#     context = {
-#         'report_date': report_date,
-#         'daily_payments': page_obj
-#     }
-#     return render(request, 'students/daily_report.html', context)
 
 def generate_daily_report(request):
     report_date = date.today()
