@@ -10,26 +10,59 @@
                 <p class="mb-0">Total male students: {{ total_male_students }}</p>
                 <p class="mb-0">Total female students: {{ total_female_students }}</p>
             </div>
+            <form method="get" class="form-inline mb-3">
+                <div class="form-group mr-2">
+                    {{ search_form.search_query.label_tag }}
+                    {{ search_form.search_query }}
+                </div>
+                <div class="form-group mr-2">
+                    {{ search_form.educational_stage.label_tag }}
+                    {{ search_form.educational_stage }}
+                </div>
+                <div class="form-group mr-2">
+                    {{ search_form.gender.label_tag }}
+                    {{ search_form.gender }}
+                </div>
+                <div class="form-group mr-2">
+                    {{ search_form.date_of_birth.label_tag }}
+                    {{ search_form.date_of_birth }}
+                </div>
+                <div class="form-group mr-2">
+                    {{ search_form.classroom.label_tag }}
+                    {{ search_form.classroom }}
+                </div>
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+            <br >
         </div>
         <div class="col-md-6">
             <h2>Student Table</h2>
+            {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
             <div class="table-responsive">
                 <table class="table table-striped">
                     <thead class="table-primary">
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                        </tr>
+                      <tr>
+                        <th>Name</th>
+                        <th>National Number</th>
+                        <th>Action</th>
+                      </tr>
                     </thead>
                     <tbody>
-                        {% for student in page_obj %}
-                            <tr class="{% cycle 'table-secondry' 'table-White' %}">
-                                <td>{{ student.id }}</td>
-                                <td>{{ student.name }}</td>
-                            </tr>
-                        {% endfor %}
+                      {% for student in page_obj %}
+                        <tr class="{% cycle 'table-secondary' 'table-white' %}">
+                        <td>{{ student.name }}</td>
+                        <td>{{ student.national_number }}</td>
+                        <td>
+                            <a href="{% url 'students:edit_student' pk=student.pk %}" class="btn btn-sm btn-primary">Edit</a>
+                        </td>
+                        </tr>
+                      {% endfor %}
                     </tbody>
-                </table>
+                  </table>
                 <!--  =======================  start pagination work =======================  -->
                 {% comment %} <div class="pagination">
                     <span class="step-links">

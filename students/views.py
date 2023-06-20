@@ -8,6 +8,7 @@ from django.views.decorators.cache import never_cache
 from django.db.models import Q
 from datetime import date
 from django.db.models import Sum, F, ExpressionWrapper, DecimalField, Case, When, F, IntegerField
+from datetime import timedelta
 
 
 # Create your views here.
@@ -23,90 +24,6 @@ def home(request):
         'page_obj': page_obj,  # Pass the page_obj variable to the template
     }
     return render(request, 'students/home.html', context)
-
-
-@login_required
-def search_student(request):
-    query = request.GET.get('query')
-    students = Student.objects.all().order_by('name')
-
-    if query and query.strip():
-        students = students.filter(Q(name__icontains=query) | Q(national_number__icontains=query))
-
-    paginator = Paginator(students, 5)  # Display 5 students per page
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-
-    context = {
-        'students': page_obj,
-        'query': query,
-        'page_obj': page_obj,  # Add this line to include the page_obj in the context
-    }
-    return render(request, 'students/search_student.html', context)
-
-  
-
-def student_list(request):
-    students = Student.objects.all()
-    student_list = Student.objects.all()
-    paginator = Paginator(student_list, 10) # Show 10 students per page
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    # Total male students
-    total_male_students = Student.objects.filter(gender='M').count()
-
-    # Total female students
-    total_female_students = Student.objects.filter(gender='F').count()
-  
-    context = {
-        'total_male_students': total_male_students,
-        'total_female_students': total_female_students,
-        'students': students,
-        'page_obj': page_obj
-    }
-    return render(request, 'students/student_list.html', context )
-
-@login_required
-def edit_student(request, pk):
-    student = get_object_or_404(Student, pk=pk)
-    if request.method == 'POST':
-        form = Student_edit_Form(request.POST, instance=student)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Student information updated successfully!')
-            return redirect('students:home')
-    else:
-        form = Student_edit_Form(instance=student)
-    context = {
-        'form': form,
-        'title': 'Edit Student'
-    }
-    return render(request, 'students/edit_student_form.html', context)
-
-
-@login_required
-def delete_student(request, student_id):
-    student = get_object_or_404(Student, id=student_id)
-    if request.method == 'POST':
-        student.delete()
-        messages.success(request, 'Student deleted successfully!')
-        return redirect('students:home')
-    context = {
-        'student': student,
-    }
-    return render(request, 'students/delete_student.html', context)
-
-@login_required
-def confirm_delete_student(request, student_id):
-    student = get_object_or_404(Student, id=student_id)
-    if request.method == 'POST':
-        student.delete()
-        messages.success(request, 'Student deleted successfully!')
-        return redirect('students:home')
-    context = {
-        'student': student,
-    }
-    return render(request, 'students/confirm_delete_student.html', context)
 
 @never_cache
 @login_required
@@ -126,6 +43,156 @@ def add_student(request):
         'student_form': student_form,
     }
     return render(request, 'students/add_student.html', context)
+
+@never_cache
+@login_required
+def search_student(request):
+    query = request.GET.get('query')
+    students = Student.objects.all().order_by('name')
+
+    if query and query.strip():
+        students = students.filter(Q(name__icontains=query) | Q(national_number__icontains=query))
+
+    paginator = Paginator(students, 5)  # Display 5 students per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'students': page_obj,
+        'query': query,
+        'page_obj': page_obj,  # Add this line to include the page_obj in the context
+    }
+    return render(request, 'students/search_student.html', context)
+ 
+
+# def student_list(request):
+#     # Retrieve all students
+#     students = Student.objects.all()
+
+#     # Create an instance of the search form
+#     search_form = StudentSearchForm(request.GET)
+
+#     # Apply search filter if provided
+#     if search_form.is_valid():
+#         search_query = search_form.cleaned_data.get('search_query')
+#         if search_query:
+#             students = students.filter(
+#                 Q(name__icontains=search_query) | Q(national_number__icontains=search_query)
+#             )
+
+#     # Paginate the student list
+#     paginator = Paginator(students, 10)  # Show 10 students per page
+#     page_number = request.GET.get('page')
+#     page_obj = paginator.get_page(page_number)
+    
+#     # Total male students
+#     total_male_students = Student.objects.filter(gender='M').count()
+
+#     # Total female students
+#     total_female_students = Student.objects.filter(gender='F').count()
+  
+#     context = {
+#         'total_male_students': total_male_students,
+#         'total_female_students': total_female_students,
+#         'students': students,
+#         'page_obj': page_obj,
+#         'search_form': search_form,
+#     }
+#     return render(request, 'students/student_list.html', context)
+
+def student_list(request):
+    # Retrieve all students
+    students = Student.objects.all()
+
+    # Create an instance of the search form
+    search_form = StudentSearchForm(request.GET)
+
+    # Apply search filter if provided
+    if search_form.is_valid():
+        search_query = search_form.cleaned_data.get('search_query')
+        educational_stage = search_form.cleaned_data.get('educational_stage')
+        gender = search_form.cleaned_data.get('gender')
+        date_of_birth = search_form.cleaned_data.get('date_of_birth')
+        classroom = search_form.cleaned_data.get('classroom')
+
+        if search_query:
+            students = students.filter(
+                Q(name__icontains=search_query) | Q(national_number__icontains=search_query)
+            )
+        if educational_stage:
+            students = students.filter(classroom__educational_stage=educational_stage)
+        if gender:
+            students = students.filter(gender=gender)
+        if date_of_birth:
+            students = students.filter(date_of_birth=date_of_birth)
+        if classroom:
+            students = students.filter(classroom=classroom)
+
+    # Paginate the student list
+    paginator = Paginator(students, 10)  # Show 10 students per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Total male students
+    total_male_students = students.filter(gender='M').count()
+
+    # Total female students
+    total_female_students = students.filter(gender='F').count()
+
+    context = {
+        'total_male_students': total_male_students,
+        'total_female_students': total_female_students,
+        'students': students,
+        'page_obj': page_obj,
+        'search_form': search_form,
+    }
+    return render(request, 'students/student_list.html', context)
+
+@never_cache
+@login_required
+def edit_student(request, pk):
+    student = get_object_or_404(Student, pk=pk)
+    if request.method == 'POST':
+        form = Student_edit_Form(request.POST, instance=student)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Student information updated successfully!')
+            return redirect('students:student_list')
+    else:
+        form = Student_edit_Form(instance=student)
+        # print(form.errors)
+        
+    context = {
+        'form': form,
+        'title': 'Edit Student',
+    }
+    return render(request, 'students/edit_student_form.html', context)
+
+@never_cache
+@login_required
+def delete_student(request, student_id):
+    student = get_object_or_404(Student, id=student_id)
+    if request.method == 'POST':
+        student.delete()
+        messages.success(request, 'Student deleted successfully!')
+        return redirect('students:home')
+    context = {
+        'student': student,
+    }
+    return render(request, 'students/delete_student.html', context)
+
+@never_cache
+@login_required
+def confirm_delete_student(request, student_id):
+    student = get_object_or_404(Student, id=student_id)
+    if request.method == 'POST':
+        student.delete()
+        messages.success(request, 'Student deleted successfully!')
+        return redirect('students:home')
+    context = {
+        'student': student,
+    }
+    return render(request, 'students/confirm_delete_student.html', context)
 
 @never_cache
 @login_required
@@ -224,28 +291,6 @@ def receipt(request, pk):
         return render(request, 'students/receipt.html', context)
 
 
-
-# @never_cache
-# @login_required
-# def student_detail(request, pk):
-#     student = get_object_or_404(Student, pk=pk)
-#     installments = Tuition.objects.filter(student=student)
-#     total_paid = sum(installment.amount for installment in installments if installment.paid)
-#     classroom = student.classroom.first()  # retrieve the first classroom for the student
-#     expenses = Expense.objects.filter(classroom=classroom)
-#     total_expenses = sum(expense.amount for expense in expenses)
-#     total_owed = total_expenses - total_paid
-#     context = {
-#         'student': student,
-#         'installments': installments,
-#         'total_paid': total_paid,
-#         'expenses': expenses,
-#         'total_expenses': total_expenses,
-#         'total_owed': total_owed,
-#     }
-#     return render(request, 'students/student_detail.html', context)
-from django.db.models import Sum
-
 @never_cache
 @login_required
 def delete_installment(request, pk):
@@ -330,6 +375,18 @@ def report(request):
     total_paid_students = Student.objects.filter(tuitions__paid=True).count()
     total_unpaid_tuitions = Tuition.objects.filter(paid=False).aggregate(Sum('amount_tuition'))['amount_tuition__sum'] or 0
 
+    # Handle form submission and retrieve expenses for the selected stage
+    selected_stage = None
+    expenses = []
+    if request.method == 'GET':
+        stage_id = request.GET.get('stage_id')
+        if stage_id:
+            try:
+                selected_stage = Classroom.objects.get(id=stage_id)
+                expenses = Expense.objects.filter(classroom=selected_stage)
+            except Classroom.DoesNotExist:
+                pass
+
     context = {
         'registered_students': registered_students,
         'total_paid_installments': total_paid_installments,
@@ -340,9 +397,13 @@ def report(request):
         'total_tuitions': total_tuitions,
         'total_paid_students': total_paid_students,
         'total_unpaid_tuitions': total_unpaid_tuitions,
+        'stages': stages,
+        'selected_stage': selected_stage,
+        'expenses': expenses,
     }
 
     return render(request, 'students/report.html', context)
+
 
 
 
@@ -382,7 +443,9 @@ def all_reports(request):
 
     # Calculate total_remaining
     total_remaining = sum(classroom['remaining_tuitions'] for classroom in classroom_stats)
-
+    
+    # Calculate total_fees_due
+    total_fees_due = sum(classroom['total_fees_due'] for classroom in classroom_stats)
     context = {
         'total_students': total_students,
         'total_installments_paid': total_installments_paid,
@@ -435,7 +498,113 @@ def g_reports(request):
     # Implement your view logic here
     return render(request, 'students/g_reports.html')
 
+
+# def generate_daily_report(request):
+#     report_date = date.today()
+#     daily_payments = Tuition.objects.filter(paid=True, receipt_date__date=report_date).values('receipt_date__date').annotate(total_amount=Sum('amount_tuition')).order_by('-receipt_date__date')
+
+#     paginator = Paginator(daily_payments, 10)  # Show 10 payments per page
+#     page_number = request.GET.get('page')
+#     page_obj = paginator.get_page(page_number)
+
+#     context = {
+#         'report_date': report_date,
+#         'daily_payments': page_obj
+#     }
+#     return render(request, 'students/daily_report.html', context)
+
 def generate_daily_report(request):
     report_date = date.today()
-    paid_students = Student.objects.filter(installments__paid=True, installments__receipt_date=report_date)
-    return render(request, 'students/daily_report.html', {'report_date': report_date, 'paid_students': paid_students})
+    start_date = report_date - timedelta(days=30)  # Change the number of days as needed
+    
+    daily_payments = Tuition.objects.filter(paid=True, receipt_date__date__range=[start_date, report_date]).values('receipt_date__date').annotate(total_amount=Sum('amount_tuition')).order_by('-receipt_date__date')
+
+    paginator = Paginator(daily_payments, 10)  # Show 10 payments per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'report_date': report_date,
+        'daily_payments': page_obj
+    }
+    return render(request, 'students/daily_report.html', context)
+
+
+def generate_student_report(request):
+    # Retrieve all students
+    students = Student.objects.all()
+
+    context = {
+        'report_data': students
+    }
+
+    return render(request, 'students/generate_student_report.html', context)
+
+def generate_installment_report(request):
+    # Retrieve all installments
+    installments = Tuition.objects.all()
+
+    context = {
+        'installments': installments
+    }
+    return render(request, 'students/generate_installment_report.html', context)
+
+def upgrade_students():
+    # Retrieve all students who need to be upgraded
+    students_to_upgrade = Student.objects.exclude(classroom__stage='Sec3')  # Exclude students already in the final stage
+
+    # Define the upgrade rules
+    upgrade_rules = {
+        'BC': 'KG1',
+        'KG1': 'KG2',
+        'KG2': 'Prim1',
+        'Prim1': 'Prim2',
+        'Prim2': 'Prim3',
+        'Prim3': 'Prim4',
+        'Prim4': 'Prim5',
+        'Prim5': 'Prim6',
+        'Prim6': 'Prep7',
+        'Prep7': 'Prep8',
+        'Prep8': 'Prep9',
+        'Prep9': 'Sec1',
+        'Sec1': 'Sec2',
+        'Sec2': 'Sec3',
+    }
+
+    # Loop through the students and upgrade them to the next educational stage
+    for student in students_to_upgrade:
+        current_stage = student.classroom.stage
+        next_stage = upgrade_rules.get(current_stage)
+
+        if next_stage:
+            student.classroom = Classroom.objects.get(stage=next_stage)
+        else:
+            # If the student has reached the final stage, move them to the archive
+            ArchiveStudent.objects.create(
+                name=student.name,
+                national_number=student.national_number,
+                age=student.age,
+                gender=student.gender,
+                date_of_birth=student.date_of_birth,
+                academic_year=student.academic_year,
+                classroom=student.classroom.stage,
+            )
+            student.delete()  # Remove the student from the Student model
+
+        # Save the changes to the student's classroom
+        student.save()
+
+
+def upgrade_students_view(request):
+    if request.method == 'POST':
+        # Perform the student upgrade process
+        upgrade_students()
+
+        # Set the success message
+        success_message = "Students have been upgraded successfully."
+
+        # Render the template with the success message
+        return render(request, 'students/upgrade_students.html', {'success_message': success_message})
+
+    # If it's a GET request, simply render the template without any message
+    return render(request, 'students/upgrade_students.html')

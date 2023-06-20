@@ -18,9 +18,12 @@ class AcademicYear(models.Model):
 
 class EducationalStage(models.Model):
     STAGE_CHOICES = (
-        ('1', 'Primary Stage'),
-        ('2', 'Prep Stage'),
-        ('3', 'Secondary Stage'),
+        ('', 'اختار المرحلة الدراسية'),
+        ('BC', 'babyclass'),
+        ('Kindergarten', 'Kindergarten'),
+        ('Primary Stage', 'Primary Stage'),
+        ('Prep Stage', 'Prep Stage'),
+        ('Secondary Stage', 'Secondary Stage'),
     )
 
     name = models.CharField(max_length=50, choices=STAGE_CHOICES, verbose_name="Educational Stage", default='default_value', null=True)

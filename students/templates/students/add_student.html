@@ -13,7 +13,21 @@
   {% endif %}
   <form method="post" novalidate>
     {% csrf_token %}
-    {{ student_form|crispy }}
+    {% comment %} {{ student_form|crispy }} {% endcomment %}
+    <div class="row">
+      <div class="col-md-4">{{ student_form.name|as_crispy_field }}</div>
+      <div class="col-md-4">{{ student_form.national_number|as_crispy_field }}</div>
+      <div class="col-md-4">{{ student_form.date_of_birth|as_crispy_field }}</div>
+    </div>
+    <div><hr style="border: 1px solid #007bff;"></div>
+    <div class="row">
+      <div class="col-3">{{ student_form.age|as_crispy_field }}</div>
+      <div class="col-3">{{ student_form.gender|as_crispy_field }}</div>
+      <div class="col-3">{{ student_form.academic_year|as_crispy_field }}</div>
+      <div class="col-3">{{ student_form.classroom|as_crispy_field }}</div>
+      
+      <div><hr style="border: 1px solid #007bff;"></div>
+  </div>
     {% comment %} <button type="submit">Add</button> {% endcomment %}
     <div class="row">
       <div>

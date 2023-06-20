@@ -1,5 +1,8 @@
 from django.contrib import admin
 from .models import *
+from import_export.admin import ImportExportModelAdmin
+from import_export.resources import ModelResource
+from .models import Student
 
 admin.site.site_header = "School App"  # Set the admin site header
 admin.site.site_title = "School App"  # Set the admin site title
@@ -29,11 +32,30 @@ class ClassroomAdmin(admin.ModelAdmin):
     get_educational_stage.short_description = 'Educational Stage'
 
 
+# class StudentResource(ModelResource):
+#     class Meta:
+#         model = Student
+#         fields = ('name', 'gender', 'date_of_birth', 'academic_year', 'classroom', 'national_number')
+#         list_display = ('name', 'national_number', 'age', 'gender', 'date_of_birth')
+#         list_filter = ('gender', 'classroom__educational_stage')
+#         search_fields = ('name', 'national_number')
+from import_export import resources
+from import_export.admin import ImportExportMixin
+from django.contrib import admin
+from .models import Student
+
+class StudentResource(resources.ModelResource):
+    class Meta:
+        model = Student
+        fields = ('name', 'gender', 'date_of_birth', 'academic_year', 'classroom', 'national_number')
+
 @admin.register(Student)
-class StudentAdmin(admin.ModelAdmin):
+class StudentAdmin(ImportExportMixin, admin.ModelAdmin):
+    resource_class = StudentResource
     list_display = ('name', 'national_number', 'age', 'gender', 'date_of_birth')
     list_filter = ('gender', 'classroom__educational_stage')
     search_fields = ('name', 'national_number')
+
 
 @admin.register(Expense)
 class ExpenseAdmin(admin.ModelAdmin):
@@ -52,3 +74,5 @@ class TuitionAdmin(admin.ModelAdmin):
     list_display = ('student', 'installment_number', 'amount_tuition', 'receipt_date')
     list_filter = ('student__classroom__educational_stage', )
     search_fields = ('student__name',)
+
+admin.site.register(ArchiveStudent)

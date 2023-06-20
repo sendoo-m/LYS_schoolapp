@@ -31,22 +31,23 @@ from django.db.models import Sum
 
 class Classroom(models.Model):
     CLASS_CHOICES = (
-        ('', 'Choose Classroom'),
-        ('BC', 'Baby Class'),
-        ('KG1', 'Kindergarten 1'),
-        ('KG2', 'Kindergarten 2'),
-        ('Prim1', 'Grade 1'),
-        ('Prim2', 'Grade 2'),
-        ('Prim3', 'Grade 3'),
-        ('Prim4', 'Grade 4'),
-        ('Prim5', 'Grade 5'),
-        ('Prim6', 'Grade 6'),
-        ('Prep7', 'Grade 7'),
-        ('Prep8', 'Grade 8'),
-        ('Prep9', 'Grade 9'),
-        ('Sec1', 'Secondary School 1'),
-        ('Sec2', 'Secondary School 2'),
-        ('Sec3', 'Secondary School 3'),
+        ('', 'اختار المرحلة التعليمية'),
+        ('BC', 'مرحلة تمهيدي'),
+        ('KG1', 'رياض أطفال 1'),
+        ('KG2', 'رياض أطفال 2'),
+        ('Prim1', 'الصف الأول الابتدائي'),
+        ('Prim2', 'الصف الثاني الابتدائي'),
+        ('Prim3', 'الصف الثالث الابتدائي'),
+        ('Prim4', 'الصف الرابع الابتدائي'),
+        ('Prim5', 'الصف الخامس الابتدائي'),
+        ('Prim6', 'الصف السادس الابتدائي'),
+        ('Prep7', 'الصف الأول الإعدادي'),
+        ('Prep8', 'الصف الثاني الإعدادي'),
+        ('Prep9', 'الصف الثالث الإعدادي'),
+        ('Sec1', 'الصف الأول الثانوي'),
+        ('Sec2', 'الصف الثاني الثانوي'),
+        ('Sec3', 'الصف الثالث الثانوي'),
+        
     )
 
     name = models.CharField(max_length=100, default='Default Classroom Name', null=True)
@@ -92,7 +93,7 @@ class Tuition(models.Model):
     amount_tuition = models.DecimalField(max_digits=8, decimal_places=2)
     paid = models.BooleanField(default=False)
     receipt_date = models.DateTimeField(default=timezone.now, editable=False)
-
+    
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)  # Save the installment first
 
@@ -101,9 +102,9 @@ class Tuition(models.Model):
         else:
             self.student.update_total_payments()  # Update total_payments and total_owed for the student when the installment is not paid
 
-
 class Student(models.Model):
     GENDER_CHOICES = (
+        ('', '---------'),
         ('M', 'Male'),
         ('F', 'Female'),
     )
@@ -115,6 +116,7 @@ class Student(models.Model):
     date_of_birth = models.DateField()
     academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE, default=timezone.now)
     classroom = models.ManyToManyField(Classroom)
+    classroom_name = models.ForeignKey(Classroom, on_delete=models.SET_NULL, null=True, related_name='students_by_name')
     total_payments = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     total_owed = models.DecimalField(max_digits=8, decimal_places=2, default=0)
 
@@ -143,8 +145,7 @@ class Student(models.Model):
 
     def remaining_tuitions(self):
         return self.student_set.filter(tuitions__paid=False).aggregate(total_remaining_tuitions=Sum('tuitions__amount'))['total_remaining_tuitions']
-
-    
+     
 class UserProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     address = models.CharField(max_length=100)
@@ -161,3 +162,19 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"Comment by {self.user.username} on {self.timestamp}"
+
+class ArchiveStudent(models.Model):
+    GENDER_CHOICES = (
+        ('M', 'Male'),
+        ('F', 'Female'),
+    )
+    name = models.CharField(max_length=50)
+    national_number = models.IntegerField(unique=True)
+    age = models.IntegerField()
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+    date_of_birth = models.DateField()
+    academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE, default=timezone.now)
+    classroom = models.CharField(max_length=50)  # You can adjust the field type as per your requirements
+
+    def __str__(self):
+        return self.name

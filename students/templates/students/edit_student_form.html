@@ -1,10 +1,33 @@
 {% extends 'students/base.html' %}
-
+{% load crispy_forms_tags %}
 {% block content %}
     <h1>{{ title }}</h1>
-    <form method="POST">
+    
+    
+    <form method="post" novalidate>
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Save</button>
-    </form>
+        
+        <div class="row">
+          <div class="col-md-4">{{ form.name|as_crispy_field }}</div>
+          <div class="col-md-4">{{ form.national_number|as_crispy_field }}</div>
+          <div class="col-md-4">{{ form.date_of_birth|as_crispy_field }}</div>
+        </div>
+        <div><hr style="border: 1px solid #007bff;"></div>
+        <div class="row">
+          <div class="col-3">{{ form.age|as_crispy_field }}</div>
+          <div class="col-3">{{ form.gender|as_crispy_field }}</div>
+          <div class="col-3">{{ form.academic_year|as_crispy_field }}</div>
+          <div class="col-3">{{ form.classroom|as_crispy_field }}</div>
+          
+          
+          <div><hr style="border: 1px solid #007bff;"></div>
+      </div>
+        {% comment %} <button type="submit">Add</button> {% endcomment %}
+        <div class="row">
+          <div>
+              <button type="submit" class="btn btn-primary mt-3 my-btn" >حفظ</button>
+              
+            </div>
+        </div>
+      </form>    
 {% endblock %}

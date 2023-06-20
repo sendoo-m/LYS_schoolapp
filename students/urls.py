@@ -20,7 +20,8 @@ urlpatterns = [
     path('all_reports/', views.all_reports, name='all_reports'),
     path('classroom/<int:classroom_id>/', views.classroom_details, name='classroom_details'),
     path('search/', views.search_student, name='search_student'),
-    # path('generate-student-report/', views.generate_student_report, name='generate_student_report'),
-    # path('generate-installment-report/', views.generate_installment_report, name='generate_installment_report'),
+    path('generate-student-report/', views.generate_student_report, name='generate_student_report'),
+    path('generate-installment-report/', views.generate_installment_report, name='generate_installment_report'),
     path('g-reports/', views.g_reports, name='g_reports'),
+    path('upgrade-students/', views.upgrade_students_view, name='upgrade_students'),
 ]
