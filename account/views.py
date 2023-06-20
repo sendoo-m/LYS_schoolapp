@@ -118,28 +118,26 @@ def view_profile(request):
     return render(request, 'account/profile.html', context)
 
 
-# def login(request):
-#     if request.method == 'POST':
-#         form = AuthenticationForm(request, request.POST)
-#         if form.is_valid():
-#             username = form.cleaned_data.get('username')
-#             password = form.cleaned_data.get('password')
-#             user = authenticate(username=username, password=password)
-#             if user is not None:
-#                 login(request, user)
-#                 return redirect('/')  # Replace 'home' with the name of your homepage URL
-#     else:
-#         form = AuthenticationForm()
-    
-#     context = {
-#         'form': form,
-#     }
-#     return render(request, 'account/login.html', context)
-
 # =================== Login  ===================
 
 # =================== logout  ===================
-def logout(request):
-    auth_logout(request)
-    return redirect('/')
+
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+
+def custom_logout(request):
+    if request.user.is_staff:  # Check if the user is an admin
+        return redirect('admin:index')  # Redirect to the admin page
+    else:
+        return redirect('students:home')  # Redirect to the home page
+
 # =================== logout  ===================
+
+def students_view(request):
+    user = request.user
+    is_administration = user.groups.filter(name='Administration').exists()
+    # Pass the `is_administration` variable to the template context
+    context = {
+        'is_administration': is_administration
+    }
+    return render(request, 'students/home.html', context)

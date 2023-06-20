@@ -3,9 +3,14 @@ from .models import *
 from import_export.admin import ImportExportModelAdmin
 from import_export.resources import ModelResource
 from .models import Student
+from django.contrib.admin import AdminSite
+from django.utils.translation import gettext_lazy as _
 
-admin.site.site_header = "School App"  # Set the admin site header
-admin.site.site_title = "School App"  # Set the admin site title
+
+admin.site.site_header = "Al-Manar School App"  # Set the admin site header
+admin.site.site_title = "Al-Manar School App"  # Set the admin site title
+admin.site.index_title = _('Dashboard')  # Set the admin site title
+
 
 @admin.register(AcademicYear)
 class AcademicYearAdmin(admin.ModelAdmin):

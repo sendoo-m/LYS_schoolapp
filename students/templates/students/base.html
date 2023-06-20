@@ -179,15 +179,15 @@
           <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'add_student' %}active{% endif %}" href="{% url 'students:add_student' %}">Add Student</a>
           </li>
-          <li class="nav-item">
+          {% comment %} <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'report' %}active{% endif %}" href="{% url 'students:report' %}">Reports</a>
-          </li>
+          </li> {% endcomment %}
           <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'search_student' %}active{% endif %}" href="{% url 'students:search_student' %}">Search Students</a>
           </li>
-          <li class="nav-item">
+          {% comment %} <li class="nav-item">
             <a class="nav-link" href="{% url 'students:g_reports' %}">Generated Reports</a>
-        </li>
+          </li> {% endcomment %}
         </ul>
         <ul class="navbar-nav">
           {% if user.is_authenticated %}
@@ -213,6 +213,41 @@
     </div>
   </nav>
 <div class="container py-4">
+     {% comment %} <!-- Content for Administration -->
+      {% if is_administration %}
+      <div class="administrators-section">
+          <h1>Administrators</h1>
+          <p>Terms and conditions for administrators go here...</p>
+          <!-- Additional content specific to administrators -->
+          {% block administrators_content %}
+          {% endblock %}
+      </div>
+      <!-- Content for Administration -->
+      {% endif %}
+
+
+      <!-- Content for Student Affairs -->
+      {% if user.groups.filter(name='student_affairs').exists %}
+      <div class="student-affairs-section">
+          <h1>Student Affairs</h1>
+          <p>Terms and conditions for student affairs go here...</p>
+          <!-- Additional content specific to student affairs -->
+          {% block student_affairs_content %}
+          {% endblock %}
+      </div>
+      {% endif %}
+
+      <!-- Content for Accounts -->
+      {% if user.groups.filter(name='accounts').exists %}
+      <div class="accounts-section">
+          <h1>Accounts</h1>
+          <p>Terms and conditions for accounts go here...</p>
+          <!-- Additional content specific to accounts -->
+          {% block accounts_content %}
+          {% endblock %}
+      </div>
+      {% endif %} {% endcomment %}
+
     {% block content %}
     {% endblock %}
 </div>
@@ -220,7 +255,7 @@
 
 <!-- Footer -->
 <footer class="bg-light text-center py-3">
-    Made with <i class="bi bi-heart"></i> Eng. Mohamed Gamal | &copy; 2023 All rights reserved | Manar Code Team 
+  Made by Eng. Muhammad Gamal | © 2023 All Rights Reserved | Al Manar Code Team 
 </footer>
 <!-- Bootstrap JS Bundle -->
 <script src="{% static 'js/bootstrap.bundle.js' %}"></script>
