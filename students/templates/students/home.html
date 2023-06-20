@@ -1,30 +1,85 @@
 {% extends 'students/base.html' %}
-{% comment %} 
-{% block title %}Home{% endblock %}
-
-{% block content %}
-    <h1>Welcome to the School App</h1>
-{% for student in students %}
-<tr>
-    <td>{{ student.id }}</td>
-    <td>{{ student.full_name }}</td>
-    <td>{{ student.classroom }}</td>
-    <td>{{ student.phone_number }}</td>
-    <td>{{ student.email }}</td>
-    <td>{{ student.address }}</td>
-    <td><a href="{% url 'students:edit_student' student.id %}">Edit</a></td>
-</tr>
-{% endfor %}
-
-{% endblock %} {% endcomment %}
-
-{% comment %} {% extends 'students/base.html' %} {% endcomment %}
 
 {% block title %}Home{% endblock %}
 
 {% block content %}
-    <h1>Welcome to the School App</h1>
-    <form method="GET" action="{% url 'students:search_student' %}">
+    <h3 class='text-center mb-5 text-white bg-success'>Welcome to Al-Manar School App</h3>
+
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-6 col-lg-4 mb-4">
+        <a href="{% url 'students:home' %}" class="d-flex flex-column align-items-center justify-content-center {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+          <i class="fas fa-home fa-4x text-primary mb-3"></i>
+          <span class="text-center text-uppercase font-weight-bold">Home</span>
+        </a>
+      </div>
+      <div class="col-12 col-md-6 col-lg-4 mb-4">
+        <a href="{% url 'students:student_list' %}" class="d-flex flex-column align-items-center justify-content-center {% if request.resolver_match.url_name == 'student_list' %}active{% endif %}">
+          <i class="fas fa-users fa-4x text-secondary mb-3"></i>
+          <span class="text-center text-uppercase font-weight-bold">Students</span>
+        </a>
+      </div>
+      <div class="col-12 col-md-6 col-lg-4 mb-4">
+        <a href="{% url 'students:add_student' %}" class="d-flex flex-column align-items-center justify-content-center {% if request.resolver_match.url_name == 'add_student' %}active{% endif %}">
+          <i class="fas fa-user-plus fa-4x text-success mb-3"></i>
+          <span class="text-center text-uppercase font-weight-bold">Add Student</span>
+        </a>
+      </div>
+      <div class="col-12 col-md-6 col-lg-4 mb-4">
+        <a href="{% url 'students:report' %}" class="d-flex flex-column align-items-center justify-content-center {% if request.resolver_match.url_name == 'report' %}active{% endif %}">
+          <i class="fas fa-chart-bar fa-4x text-danger mb-3"></i>
+          <span class="text-center text-uppercase font-weight-bold">Reports</span>
+        </a>
+      </div>
+      <div class="col-12 col-md-6 col-lg-4 mb-4">
+        <a href="{% url 'students:search_student' %}" class="d-flex flex-column align-items-center justify-content-center {% if request.resolver_match.url_name == 'search_student' %}active{% endif %}">
+          <i class="fas fa-search fa-4x text-warning mb-3"></i>
+          <span class="text-center text-uppercase font-weight-bold">Search Students</span>
+        </a>
+      </div>
+      <div class="col-12 col-md-6 col-lg-4 mb-4">
+        <a href="{% url 'students:g_reports' %}" class="d-flex flex-column align-items-center justify-content-center">
+          <i class="fas fa-file-alt fa-4x text-info mb-3"></i>
+          <span class="text-center text-uppercase font-weight-bold">Generated Reports</span>
+        </a>
+      </div>
+      {% if user.is_authenticated %}
+      <div class="col-12 col-md-6 col-lg-4 mb-4">
+        <a href="{% url 'account:view_profile' %}" class="d-flex flex-column align-items-center justify-content-center">
+          <i class="fas fa-user fa-4x text-primary mb-3"></i>
+          <span class="text-center text-uppercase font-weight-bold">Welcome, {{ user.username }}</span>
+        </a>
+      </div>
+      <div class="col-12 col-md-6 col-lg-4 mb-4">
+        <a href="{% url 'account:change_password' %}" class="d-flex flex-column align-items-center justify-content-center">
+          <i class="fas fa-lock fa-4x text-secondary mb-3"></i>
+          <span class="text-center text-uppercase font-weight-bold">Change Password</span>
+        </a>
+      </div>
+      <div class="col-12 col-md-6 col-lg-4 mb-4">
+        <a href="{% url 'account:logout' %}" class="d-flex flex-column align-items-center justify-content-center">
+          <i class="fas fa-sign-out-alt fa-4x text-danger mb-3"></i>
+          <span class="text-center text-uppercase font-weight-bold">Logout</span>
+        </a>
+      </div>
+      {% else %}
+      <div class="col-12 col-md-6 col-lg-4 mb-4">
+        <a href="{% url 'account:login' %}" class="d-flex flex-column align-items-center justify-content-center">
+          <i class="fas fa-sign-in-alt fa-4x text-primary mb-3"></i>
+          <span class="text-center text-uppercase font-weight-bold">Login</span>
+        </a>
+      </div>
+      {% comment %} <div class="col-12 col-md-6 col-lg-4 mb-4">
+        <a href="{% url 'account:register' %}" class="d-flex flex-column align-items-center justify-content-center">
+          <i class="fas fa-user-plus fa-4x text-success mb-3"></i>
+          <span class="text-center text-uppercase font-weight-bold">Register</span>
+        </a>
+      </div> {% endcomment %}
+      {% endif %}
+    </div>
+  </div>
+
+    {% comment %} <form method="GET" action="{% url 'students:search_student' %}">
         <input type="text" name="search_query" placeholder="Search by name">
         <button type="submit">Search</button>
       </form>
@@ -80,7 +135,7 @@
             {% endif %}
         </ul>
     </nav>
-</div>
+</div> {% endcomment %}
 <!-- End of pagination code -->
     <!--  =======================  End pagination =======================  -->
 {% endblock %}
