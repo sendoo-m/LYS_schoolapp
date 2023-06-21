@@ -93,6 +93,7 @@ class Tuition(models.Model):
     amount_tuition = models.DecimalField(max_digits=8, decimal_places=2)
     paid = models.BooleanField(default=False)
     receipt_date = models.DateTimeField(default=timezone.now, editable=False)
+    payment_user = models.CharField(max_length=50, default="account user")
     
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)  # Save the installment first

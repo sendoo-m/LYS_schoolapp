@@ -101,7 +101,7 @@ class ExpenseForm(forms.ModelForm):
 class TuitionForm(forms.ModelForm):
     class Meta:
         model = Tuition
-        fields = ['installment_number', 'amount_tuition']
+        fields = ['installment_number', 'amount_tuition', 'payment_user']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

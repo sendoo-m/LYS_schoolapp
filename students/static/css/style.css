@@ -21,3 +21,8 @@
   border-color: #0062cc;
 }
 
+@media print {
+  footer {
+      display: none;
+  }
+}

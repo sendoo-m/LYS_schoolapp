@@ -12,7 +12,8 @@ from datetime import timedelta
 
 
 # Create your views here.
-
+@never_cache
+@login_required
 def home(request):
     students = Student.objects.all()
     paginator = Paginator(students, 10)  # Display 10 students per page
@@ -100,6 +101,8 @@ def search_student(request):
 #     }
 #     return render(request, 'students/student_list.html', context)
 
+@never_cache
+@login_required
 def student_list(request):
     # Retrieve all students
     students = Student.objects.all()
@@ -249,7 +252,8 @@ def pay_installment(request, pk):
     }
     return render(request, 'students/pay_installment.html', context)
 
-
+@never_cache
+@login_required
 def add_comment(request):
     if request.method == 'POST':
         form = CommentForm(request.POST)
@@ -334,7 +338,8 @@ def student_detail(request, pk):
     return render(request, 'students/student_detail.html', context)
 
 
-
+@never_cache
+@login_required
 def report(request):
     # Number of registered students
     registered_students = Student.objects.count()
@@ -406,7 +411,8 @@ def report(request):
 
 
 
-
+@never_cache
+@login_required
 def all_reports(request):
     # Overall statistics
     total_students = Student.objects.count()
@@ -493,10 +499,9 @@ def all_reports(request):
 
 #     return render(request, 'students/classroom_details.html', context)
 
-from django.db.models import Sum
 
-from django.db.models import Sum
-
+@never_cache
+@login_required
 def classroom_details(request, classroom_id):
     classroom = Classroom.objects.get(id=classroom_id)
     expenses = Expense.objects.filter(classroom=classroom)
@@ -536,12 +541,14 @@ def classroom_details(request, classroom_id):
 
 
 
-
+@never_cache
+@login_required
 def g_reports(request):
     # Implement your view logic here
     return render(request, 'students/g_reports.html')
 
-
+@never_cache
+@login_required
 def generate_daily_report(request):
     report_date = date.today()
     start_date = report_date - timedelta(days=30)  # Change the number of days as needed
@@ -558,7 +565,8 @@ def generate_daily_report(request):
     }
     return render(request, 'students/daily_report.html', context)
 
-
+@never_cache
+@login_required
 def generate_student_report(request):
     # Retrieve all students
     students = Student.objects.all()
@@ -569,6 +577,8 @@ def generate_student_report(request):
 
     return render(request, 'students/generate_student_report.html', context)
 
+@never_cache
+@login_required
 def generate_installment_report(request):
     # Retrieve all installments
     installments = Tuition.objects.all()
@@ -578,6 +588,8 @@ def generate_installment_report(request):
     }
     return render(request, 'students/generate_installment_report.html', context)
 
+@never_cache
+@login_required
 def upgrade_students():
     # Retrieve all students who need to be upgraded
     students_to_upgrade = Student.objects.exclude(classroom__stage='Sec3')  # Exclude students already in the final stage
@@ -623,7 +635,8 @@ def upgrade_students():
         # Save the changes to the student's classroom
         student.save()
 
-
+@never_cache
+@login_required
 def upgrade_students_view(request):
     if request.method == 'POST':
         # Perform the student upgrade process

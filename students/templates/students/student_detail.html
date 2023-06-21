@@ -4,6 +4,19 @@
 {% block title %}{{ student.name }} - Student Detail{% endblock %}
 
 {% block content %}
+<style>
+    /* Hide the button on the print paper */
+    @media print {
+      .print-button {
+        display: none;
+      }
+    }
+    @media print {
+        footer {
+            display: none;
+        }
+    }
+</style>
 <!-- ============================= chat GPT code ============================= -->
 <h3 class='text-center text-danger'>الحسابات والمدفوعات الخاصة بـ {{ student.name }} </h3>
 <!-- Existing code omitted for brevity -->
@@ -73,7 +86,7 @@
                             {% endif %}
                         {% endif %}
                     </td><!-- نهاية علامة الدفع بالالوان --> {% endcomment %}
-                    <td>{{ user.username }}</td>
+                    <td>{{ installment.payment_user }}</td>
                     <td>
                         <a href="{% url 'students:receipt' pk=installment.pk %}" class="btn btn-secondary btn-sm">إيصال القسط</a>
                         {% comment %}<form method="POST" action="{% url 'students:delete_installment' pk=installment.pk %}" style="display: inline;">
