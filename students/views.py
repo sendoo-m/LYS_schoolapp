@@ -26,24 +26,44 @@ def home(request):
     }
     return render(request, 'students/home.html', context)
 
-@never_cache
-@login_required
+# @never_cache
+# @login_required
+# def add_student(request):
+#     if request.method == 'POST':
+#         student_form = StudentForm(request.POST)
+#         if student_form.is_valid():
+#             student = student_form.save(commit=False)  # Save the student object without committing to the database
+#             # Perform any necessary modifications to the student object here
+#             student.save()  # Save the student object to generate an ID
+#             student_form.save_m2m()  # Save the many-to-many relationships after saving the student
+#             messages.success(request, 'Student added successfully!')
+#             return redirect('students:add_student')
+#     else:
+#         student_form = StudentForm()
+   
+#     context = {
+#         'student_form': student_form,
+#     }
+#     return render(request, 'students/add_student.html', context)
+from django.db import transaction
+
 def add_student(request):
     if request.method == 'POST':
         student_form = StudentForm(request.POST)
         if student_form.is_valid():
-            student = student_form.save(commit=False)  # Save the student object without committing to the database
-            student.save()  # Save the student object to generate an ID
-            student_form.save_m2m()  # Save the many-to-many relationships after saving the student
-            messages.success(request, 'Student added successfully!')
-            return redirect('students:add_student')
+            with transaction.atomic():
+                student = student_form.save()
+                student_form.save_m2m()
+            messages.success(request, 'Student information updated successfully!')
+            return redirect('students:student_list')
     else:
         student_form = StudentForm()
-   
+        
     context = {
         'student_form': student_form,
     }
     return render(request, 'students/add_student.html', context)
+
 
 @never_cache
 @login_required
@@ -64,42 +84,7 @@ def search_student(request):
         'page_obj': page_obj,  # Add this line to include the page_obj in the context
     }
     return render(request, 'students/search_student.html', context)
- 
 
-# def student_list(request):
-#     # Retrieve all students
-#     students = Student.objects.all()
-
-#     # Create an instance of the search form
-#     search_form = StudentSearchForm(request.GET)
-
-#     # Apply search filter if provided
-#     if search_form.is_valid():
-#         search_query = search_form.cleaned_data.get('search_query')
-#         if search_query:
-#             students = students.filter(
-#                 Q(name__icontains=search_query) | Q(national_number__icontains=search_query)
-#             )
-
-#     # Paginate the student list
-#     paginator = Paginator(students, 10)  # Show 10 students per page
-#     page_number = request.GET.get('page')
-#     page_obj = paginator.get_page(page_number)
-    
-#     # Total male students
-#     total_male_students = Student.objects.filter(gender='M').count()
-
-#     # Total female students
-#     total_female_students = Student.objects.filter(gender='F').count()
-  
-#     context = {
-#         'total_male_students': total_male_students,
-#         'total_female_students': total_female_students,
-#         'students': students,
-#         'page_obj': page_obj,
-#         'search_form': search_form,
-#     }
-#     return render(request, 'students/student_list.html', context)
 
 @never_cache
 @login_required
@@ -466,40 +451,6 @@ def all_reports(request):
 
 
 
-# get total from student table its good work
-
-
-# def classroom_details(request, classroom_id):
-    
-#     classroom = Classroom.objects.get(id=classroom_id)
-
-#     # Calculate total expenses for the classroom
-#     total_expenses = Expense.objects.filter(classroom=classroom).aggregate(total_expenses=Sum('amount'))['total_expenses'] or 0
-
-#     # Get the search query from the request
-#     search_query = request.GET.get('search')
-
-#     # Filter students based on the search query
-#     if search_query:
-#         students = classroom.student_set.filter(Q(name__icontains=search_query) | Q(national_number__icontains=search_query))
-#     else:
-#         students = classroom.student_set.all()
-
-#     # Paginate the students
-#     paginator = Paginator(students, 10)
-#     page_number = request.GET.get('page')
-#     page_obj = paginator.get_page(page_number)
-
-#     context = {
-#         'classroom': classroom,
-#         'page_obj': page_obj,
-#         'search_query': search_query,
-#         'total_expenses': total_expenses,
-#     }
-
-#     return render(request, 'students/classroom_details.html', context)
-
-
 @never_cache
 @login_required
 def classroom_details(request, classroom_id):
@@ -588,9 +539,7 @@ def generate_installment_report(request):
     }
     return render(request, 'students/generate_installment_report.html', context)
 
-@never_cache
-@login_required
-def upgrade_students():
+def upgrade_students(request):
     # Retrieve all students who need to be upgraded
     students_to_upgrade = Student.objects.exclude(classroom__stage='Sec3')  # Exclude students already in the final stage
 
@@ -614,33 +563,38 @@ def upgrade_students():
 
     # Loop through the students and upgrade them to the next educational stage
     for student in students_to_upgrade:
-        current_stage = student.classroom.stage
+        current_stage = student.classroom.first().stage
         next_stage = upgrade_rules.get(current_stage)
 
         if next_stage:
-            student.classroom = Classroom.objects.get(stage=next_stage)
+            student.classroom.set(Classroom.objects.filter(stage=next_stage))
         else:
             # If the student has reached the final stage, move them to the archive
             ArchiveStudent.objects.create(
-                name=student.name,
-                national_number=student.national_number,
-                age=student.age,
-                gender=student.gender,
-                date_of_birth=student.date_of_birth,
-                academic_year=student.academic_year,
-                classroom=student.classroom.stage,
+                archive_name=student.name,
+                archive_national_number=student.national_number,
+                archive_age=student.age,
+                archive_gender=student.gender,
+                archive_date_of_birth=student.date_of_birth,
+                archive_academic_year=student.academic_year,
+                archive_classroom=student.classroom.stage,
+                archive_total_payments=student.total_payments,
+                archive_total_owed=student.total_owed,
             )
             student.delete()  # Remove the student from the Student model
 
         # Save the changes to the student's classroom
         student.save()
 
+    # Return a response or perform any additional actions based on the request
+    # ...
+
 @never_cache
 @login_required
 def upgrade_students_view(request):
     if request.method == 'POST':
         # Perform the student upgrade process
-        upgrade_students()
+        upgrade_students(request)
 
         # Set the success message
         success_message = "Students have been upgraded successfully."

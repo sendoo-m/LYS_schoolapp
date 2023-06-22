@@ -5,7 +5,10 @@ from import_export.resources import ModelResource
 from .models import Student
 from django.contrib.admin import AdminSite
 from django.utils.translation import gettext_lazy as _
-
+from import_export import resources
+from import_export.admin import ImportExportMixin
+from django.contrib import admin
+from .models import Student
 
 admin.site.site_header = "Al-Manar School App"  # Set the admin site header
 admin.site.site_title = "Al-Manar School App"  # Set the admin site title
@@ -44,10 +47,7 @@ class ClassroomAdmin(admin.ModelAdmin):
 #         list_display = ('name', 'national_number', 'age', 'gender', 'date_of_birth')
 #         list_filter = ('gender', 'classroom__educational_stage')
 #         search_fields = ('name', 'national_number')
-from import_export import resources
-from import_export.admin import ImportExportMixin
-from django.contrib import admin
-from .models import Student
+
 
 class StudentResource(resources.ModelResource):
     class Meta:

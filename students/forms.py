@@ -2,9 +2,55 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import *
+from django.core.validators import RegexValidator
+from django import forms
+from .models import Student, EducationalStage, Classroom
+
+# class StudentForm(forms.ModelForm):
+#     class Meta:
+#         model = Student
+#         fields = ['name', 'national_number', 'gender', 'age', 'date_of_birth', 'classroom']
+#         widgets = {
+#             'date_of_birth': forms.DateInput(attrs={'type': 'date'})
+#         }
 
 
+# class StudentForm(forms.ModelForm):
+#     national_number = forms.CharField(
+#         label='National number',
+#         validators=[
+#             RegexValidator(
+#                 regex=r'^\d{14}$',
+#                 message='National number must be a 14-digit number',
+#             ),
+#         ],
+#     )
+    
+#     class Meta:
+#         model = Student
+#         fields = '__all__' # ['name', 'national_number', 'gender', 'age', 'date_of_birth', 'classroom']
+#         widgets = {
+#             'date_of_birth': forms.DateInput(attrs={'type': 'date'})
+#         }
 class StudentForm(forms.ModelForm):
+    national_number = forms.CharField(
+        label='National number',
+        validators=[
+            RegexValidator(
+                regex=r'^\d{14}$',
+                message='National number must be a 14-digit number',
+            ),
+        ],
+    )
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        # Perform any necessary modifications to the instance object here
+        if commit:
+            instance.save()
+            self.save_m2m()
+        return instance
+
     class Meta:
         model = Student
         fields = '__all__'
@@ -12,32 +58,11 @@ class StudentForm(forms.ModelForm):
             'date_of_birth': forms.DateInput(attrs={'type': 'date'})
         }
 
-
 class Student_edit_Form(forms.ModelForm):
     class Meta:
         model = Student
-        fields = ['name', 'national_number', 'gender', 'age', 'date_of_birth', 'academic_year', 'classroom']
+        fields = ['name', 'national_number', 'gender', 'age', 'date_of_birth', 'classroom']
 
-# class StudentSearchForm(forms.Form):
-#     search_query = forms.CharField(label='Search', required=False, max_length=100, 
-#                                    widget=forms.TextInput(attrs={
-#         'placeholder': 'Search by Name, National Number',
-#         'class': 'form-control',
-#     }))
-
-# class StudentSearchForm(forms.Form):
-#     search_query = forms.CharField(label='Search', required=False, max_length=100, 
-#                                    widget=forms.TextInput(attrs={
-#         'placeholder': 'Search by Name, National Number',
-#         'class': 'form-control',
-#     }))
-#     educational_stage = forms.ModelChoiceField(queryset=EducationalStage.objects.all(), label='Educational Stage', required=False)
-#     gender = forms.ChoiceField(choices=Student.GENDER_CHOICES, label='Gender', required=False)
-#     # date_of_birth = forms.DateField(label='Date of Birth', required=False)
-#     classroom = forms.ModelChoiceField(queryset=Classroom.objects.all(), label='Classroom', required=False)
-
-from django import forms
-from .models import Student, EducationalStage, Classroom
 
 class StudentSearchForm(forms.Form):
     search_query = forms.CharField(
@@ -83,20 +108,22 @@ class StudentSearchForm(forms.Form):
     )
 
 
+# class ExpenseForm(forms.ModelForm):
+#     class Meta:
+#         model = Expense
+#         fields = ['expense_type', 'amount', 'date']
+#         widgets = {
+#             'date': forms.DateInput(attrs={'type': 'date'})
+#         }
 class ExpenseForm(forms.ModelForm):
+    date = forms.DateField(
+        label='Date',
+        widget=forms.DateInput(attrs={'type': 'date'})
+    )
+
     class Meta:
         model = Expense
         fields = ['expense_type', 'amount', 'date']
-        widgets = {
-            'date': forms.DateInput(attrs={'type': 'date'})
-        }
-
-# class TuitionForm(forms.ModelForm):
-#     class Meta:
-#         model = Tuition
-#         fields = ['installment_number', 'amount_tuition']
-
-
 
 class TuitionForm(forms.ModelForm):
     class Meta:

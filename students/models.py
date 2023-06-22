@@ -7,7 +7,6 @@ from django.dispatch import receiver
 from django.db.models import Sum
 
 
-
 # Create your models here.
 
 class EducationalStage(models.Model):
@@ -25,9 +24,6 @@ class EducationalStage(models.Model):
     def __str__(self):
         return self.name
 
-from django.db import models
-from django.utils import timezone
-from django.db.models import Sum
 
 class Classroom(models.Model):
     CLASS_CHOICES = (
@@ -109,17 +105,16 @@ class Student(models.Model):
         ('M', 'Male'),
         ('F', 'Female'),
     )
-
+    
     name = models.CharField(max_length=50)
     national_number = models.IntegerField(unique=True)
     age = models.IntegerField()
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     date_of_birth = models.DateField()
-    academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE, default=timezone.now)
+    academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE, default=timezone.now, null=True, blank=True)
     classroom = models.ManyToManyField(Classroom)
-    classroom_name = models.ForeignKey(Classroom, on_delete=models.SET_NULL, null=True, related_name='students_by_name')
-    total_payments = models.DecimalField(max_digits=8, decimal_places=2, default=0)
-    total_owed = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    total_payments = models.DecimalField(max_digits=8, decimal_places=2, default=0, null=True, blank=True)
+    total_owed = models.DecimalField(max_digits=8, decimal_places=2, default=0, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -166,16 +161,20 @@ class Comment(models.Model):
 
 class ArchiveStudent(models.Model):
     GENDER_CHOICES = (
+        ('', '---------'),
         ('M', 'Male'),
         ('F', 'Female'),
     )
-    name = models.CharField(max_length=50)
-    national_number = models.IntegerField(unique=True)
-    age = models.IntegerField()
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
-    date_of_birth = models.DateField()
-    academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE, default=timezone.now)
-    classroom = models.CharField(max_length=50)  # You can adjust the field type as per your requirements
+
+    archive_name = models.CharField(max_length=50)
+    archive_national_number = models.IntegerField(unique=True)
+    archive_age = models.IntegerField()
+    archive_gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+    archive_date_of_birth = models.DateField()
+    archive_academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE, default=timezone.now)
+    archive_classroom = models.ManyToManyField(Classroom)
+    archive_total_payments = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    archive_total_owed = models.DecimalField(max_digits=8, decimal_places=2, default=0)
 
     def __str__(self):
-        return self.name
+        return self.archive_name
