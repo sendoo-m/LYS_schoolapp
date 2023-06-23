@@ -5,6 +5,9 @@ from .models import *
 from django.core.validators import RegexValidator
 from django import forms
 from .models import Student, EducationalStage, Classroom
+from django.core.validators import MinValueValidator, MaxValueValidator
+from datetime import date
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 # class StudentForm(forms.ModelForm):
 #     class Meta:
@@ -43,6 +46,23 @@ class StudentForm(forms.ModelForm):
         ],
     )
 
+    age = forms.IntegerField(
+        validators=[
+            MinValueValidator(3, message='Age must be between 3 and 17 years.'),
+            MaxValueValidator(17, message='Age must be between 3 and 17 years.'),
+        ]
+    )
+
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        # Perform any necessary modifications to the instance object here
+        if commit:
+            instance.save()
+            self.save_m2m()
+        return instance
+    
+
     def save(self, commit=True):
         instance = super().save(commit=False)
         # Perform any necessary modifications to the instance object here
@@ -57,6 +77,37 @@ class StudentForm(forms.ModelForm):
         widgets = {
             'date_of_birth': forms.DateInput(attrs={'type': 'date'})
         }
+
+
+    def calculate_age(date_of_birth):
+        today = date.today()
+        age = today.year - date_of_birth.year
+        if today.month < date_of_birth.month or (today.month == date_of_birth.month and today.day < date_of_birth.day):
+            age -= 1
+        return age
+    
+    class Meta:
+        model = Student
+        fields = '__all__'
+        widgets = {
+            'date_of_birth': forms.DateInput(attrs={'type': 'date'})
+        }
+
+    def __init__(self,  *args, **kwargs):
+        super(StudentForm, self).__init__(*args, **kwargs)
+        # HTML attributes:
+            # Max Length, user physically couldn't type more than 35
+            # some fields also can have the `pattern` attribute which allows you to have REGEX
+        self.fields['national_number'].widget.attrs={'class': 'form-control', 'maxlength': '14'}
+    
+    classroom = forms.ModelChoiceField(
+        queryset=Classroom.objects.all(), 
+        label='Classroom', 
+        required=False,
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+        })
+    )
 
 class Student_edit_Form(forms.ModelForm):
     class Meta:

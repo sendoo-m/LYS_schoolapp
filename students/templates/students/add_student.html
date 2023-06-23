@@ -5,13 +5,13 @@
 
 
 {% block content %}
-  
-  {% if messages %}
+
+  {% comment %}{% if messages %}
     {% for message in messages %}
       <div class="alert alert-{{ message.tags }}">{{ message }}</div>
     {% endfor %}
   {% endif %}
-  {% comment %} <form method="post" novalidate>
+   <form method="post" novalidate>
     {% csrf_token %}
     <div class="row">
       <div class="col-md-4">{{ student_form.name|as_crispy_field }}</div>
@@ -34,8 +34,7 @@
         </div>
     </div>
   </form> {% endcomment %}
- 
-  <div class="container mt-5">
+  <div class="container mt-3">
     <div class="row justify-content-center">
       <div class="col-md-8">
         <div class="card border-white rounded-0 shadow">
@@ -48,7 +47,7 @@
                 <div class="alert alert-{{ message.tags }}">{{ message }}</div>
               {% endfor %}
             {% endif %}
-            <form method="post" novalidate style="width: 60%;">
+            <form method="post" novalidate style="width: 70%;">
               {% csrf_token %}
               <div class="form-group">{{ student_form.name|as_crispy_field }}</div>
               <div class="form-group">{{ student_form.national_number|as_crispy_field }}  <small class="form-text text-muted">

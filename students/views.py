@@ -26,43 +26,43 @@ def home(request):
     }
     return render(request, 'students/home.html', context)
 
-# @never_cache
-# @login_required
-# def add_student(request):
-#     if request.method == 'POST':
-#         student_form = StudentForm(request.POST)
-#         if student_form.is_valid():
-#             student = student_form.save(commit=False)  # Save the student object without committing to the database
-#             # Perform any necessary modifications to the student object here
-#             student.save()  # Save the student object to generate an ID
-#             student_form.save_m2m()  # Save the many-to-many relationships after saving the student
-#             messages.success(request, 'Student added successfully!')
-#             return redirect('students:add_student')
-#     else:
-#         student_form = StudentForm()
-   
-#     context = {
-#         'student_form': student_form,
-#     }
-#     return render(request, 'students/add_student.html', context)
-from django.db import transaction
-
+@never_cache
+@login_required
 def add_student(request):
     if request.method == 'POST':
         student_form = StudentForm(request.POST)
         if student_form.is_valid():
-            with transaction.atomic():
-                student = student_form.save()
-                student_form.save_m2m()
-            messages.success(request, 'Student information updated successfully!')
-            return redirect('students:student_list')
+            student = student_form.save(commit=False)  # Save the student object without committing to the database
+            # Perform any necessary modifications to the student object here
+            student.save()  # Save the student object to generate an ID
+            student_form.save_m2m()  # Save the many-to-many relationships after saving the student
+            messages.success(request, 'Student added successfully!')
+            return redirect('students:student_list') # student_list or  add_student
     else:
         student_form = StudentForm()
-        
+   
     context = {
         'student_form': student_form,
     }
     return render(request, 'students/add_student.html', context)
+# from django.db import transaction
+
+# def add_student(request):
+#     if request.method == 'POST':
+#         student_form = StudentForm(request.POST)
+#         if student_form.is_valid():
+#             with transaction.atomic():
+#                 student = student_form.save()
+#                 student_form.save_m2m()
+#             messages.success(request, 'Student information updated successfully!')
+#             return redirect('students:student_list')
+#     else:
+#         student_form = StudentForm()
+        
+#     context = {
+#         'student_form': student_form,
+#     }
+#     return render(request, 'students/add_student.html', context)
 
 
 @never_cache
