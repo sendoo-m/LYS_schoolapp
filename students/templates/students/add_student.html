@@ -50,12 +50,19 @@
             <form method="post" novalidate style="width: 70%;">
               {% csrf_token %}
               <div class="form-group">{{ student_form.name|as_crispy_field }}</div>
-              <div class="form-group">{{ student_form.national_number|as_crispy_field }}  <small class="form-text text-muted">
+              <div class="form-group">{{ student_form.national_number|as_crispy_field }}  
+                <small class="form-text text-muted">
                   Enter National number must be a 14-digit number.
                 </small>
               </div>
+              <div class="form-group">{{ student_form.phone_number|as_crispy_field }}  
+                <small class="form-text text-muted">
+                  Enter Phone number must be a 11-digit number.
+                </small>
+              </div>
               <div class="form-group">{{ student_form.date_of_birth|as_crispy_field }}</div>
-              <div class="form-group">{{ student_form.age|as_crispy_field }}  <small class="form-text text-muted">
+              <div class="form-group">{{ student_form.age|as_crispy_field }}  
+                <small class="form-text text-muted">
                   Age must be between 4 and 17 years.
                 </small>
               </div>

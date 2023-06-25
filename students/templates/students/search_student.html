@@ -8,7 +8,7 @@
     <h1>Search Students</h1>
     <form method="GET" action="{% url 'students:search_student' %}">
       <div class="input-group mb-3">
-        <input type="text" class="form-control" name="query" placeholder="Search by name" value="{{ query }}">
+        <input type="text" class="form-control" name="query" placeholder="Search by name or National ID ">
         <button type="submit" class="btn btn-primary">Search</button>
       </div>
     </form>
@@ -23,7 +23,8 @@
               <th>National Number</th>
               {% comment %} <th>Status</th> {% endcomment %}
               <th>Age</th>
-              <th>class </th>
+              <th>Classroom</th>
+              <th>Stage</th> 
               <th>Actions</th>
             </tr>
           </thead>
@@ -44,10 +45,26 @@
                   {% endif %}
               </td><!-- نهاية علامة الدفع بالالوان --> {% endcomment %}
                 <td>{{ student.age }}</td>
-                <td>{{ student.classroom_stage }}</td>
+                <td>
+                  {% for classroom in student.classroom.all %}
+                  {{ classroom.name }}
+                  {% if not forloop.last %}, {% endif %}
+                  {% empty %}
+                  N/A
+                  {% endfor %}
+              </td>
+              <td>
+                {% for classroom in student.classroom.all %}
+                {{ classroom.stage }}
+                {% if not forloop.last %}, {% endif %}
+                {% empty %}
+                N/A
+                {% endfor %}
+            </td>
+                
                 <td>
                   {% comment %} <a href="{% url 'students:edit_student' pk=student.pk %}" class="btn btn-primary btn-sm">Edit</a> {% endcomment %}
-                  <a href="{% url 'students:student_detail' pk=student.pk %}" class="btn btn-primary btn-sm">View Installments</a>
+                  <a href="{% url 'students:student_detail' pk=student.pk %}" class="btn btn-primary btn-sm">تفاصيل ودفع الأقساط</a>
                   
                 </td>
               </tr>

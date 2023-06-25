@@ -4,61 +4,61 @@
 
 {% comment %} {% block content %} {% endcomment %}
 {% block content %}
-  <h3 class="text-center mb-5 text-white bg-success">Welcome to Al-Manar School App</h3>
+  <h3 class="text-center mb-5 text-white bg-success">Welcome to Al-Manar School Account App</h3>
   <div class="row justify-content-center">
     <div class="col-12 col-md-6 col-lg-3 mb-4">
-      <a href="{% url 'students:home' %}" class="d-flex flex-column align-items-center justify-content-center {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+      <a href="{% url 'students:home' %}" class="d-flex flex-column align-items-center justify-content-center  {% if request.resolver_match.url_name == 'home' %}active{% endif %}" style="text-decoration: none;">
         <i class="fas fa-home fa-4x text-primary mb-3"></i>
-        <span class="text-center text-uppercase font-weight-bold">Home</span>
+        <span class="text-center text-uppercase font-weight-bold" style="font-size: 18px;">الرئيسية</span><!-- Home -->
       </a>
     </div>
     <div class="col-12 col-md-6 col-lg-3 mb-4">
-      <a href="{% url 'students:student_list' %}" class="d-flex flex-column align-items-center justify-content-center {% if request.resolver_match.url_name == 'student_list' %}active{% endif %}">
+      <a href="{% url 'students:student_list' %}" class="d-flex flex-column align-items-center justify-content-center  {% if request.resolver_match.url_name == 'student_list' %}active{% endif %}" style="text-decoration: none;">
         <i class="fas fa-users fa-4x text-secondary mb-3"></i>
-        <span class="text-center text-uppercase font-weight-bold">Students</span>
+        <span class="text-center text-uppercase font-weight-bold" style="font-size: 18px;"> قائمة الطلاب</span><!-- Students -->
       </a>
     </div>
     <div class="col-12 col-md-6 col-lg-3 mb-4">
-      <a href="{% url 'students:add_student' %}" class="d-flex flex-column align-items-center justify-content-center {% if request.resolver_match.url_name == 'add_student' %}active{% endif %}">
+      <a href="{% url 'students:add_student' %}" class="d-flex flex-column align-items-center justify-content-center  {% if request.resolver_match.url_name == 'add_student' %}active{% endif %}" style="text-decoration: none;">
         <i class="fas fa-user-plus fa-4x text-success mb-3"></i>
-        <span class="text-center text-uppercase font-weight-bold">Add Student</span>
+        <span class="text-center text-uppercase font-weight-bold" style="font-size: 18px;"> اضافة طالب</span><!-- Add Student -->
       </a>
     </div>
     <div class="col-12 col-md-6 col-lg-3 mb-4">
-      <a href="{% url 'students:report' %}" class="d-flex flex-column align-items-center justify-content-center {% if request.resolver_match.url_name == 'report' %}active{% endif %}">
+      <a href="{% url 'students:report' %}" class="d-flex flex-column align-items-center justify-content-center  {% if request.resolver_match.url_name == 'report' %}active{% endif %}" style="text-decoration: none;">
         <i class="fas fa-chart-bar fa-4x text-danger mb-3"></i>
-        <span class="text-center text-uppercase font-weight-bold">Reports</span>
+        <span class="text-center text-uppercase font-weight-bold" style="font-size: 18px;"> تقرير المراحل</span><!-- Reports -->
       </a>
     </div>
     <div class="col-12 col-md-6 col-lg-3 mb-4">
-      <a href="{% url 'students:search_student' %}" class="d-flex flex-column align-items-center justify-content-center {% if request.resolver_match.url_name == 'search_student' %}active{% endif %}">
+      <a href="{% url 'students:search_student' %}" class="d-flex flex-column align-items-center justify-content-center  {% if request.resolver_match.url_name == 'search_student' %}active{% endif %}" style="text-decoration: none;">
         <i class="fas fa-search fa-4x text-warning mb-3"></i>
-        <span class="text-center text-uppercase font-weight-bold">Search Students</span>
+        <span class="text-center text-uppercase font-weight-bold" style="font-size: 18px;"> دفع الاقساط</span><!-- Search Students -->
       </a>
     </div>
     <div class="col-12 col-md-6 col-lg-3 mb-4">
-      <a href="{% url 'students:g_reports' %}" class="d-flex flex-column align-items-center justify-content-center {% if request.resolver_match.url_name == 'g_reports' %}active{% endif %}">
+      <a href="{% url 'students:g_reports' %}" class="d-flex flex-column align-items-center justify-content-center  {% if request.resolver_match.url_name == 'g_reports' %}active{% endif %}" style="text-decoration: none;">
         <i class="fas fa-file-alt fa-4x text-info mb-3"></i>
-        <span class="text-center text-uppercase font-weight-bold">Generated Reports</span>
+        <span class="text-center text-uppercase font-weight-bold" style="font-size: 18px;"> انشاء تقارير </span><!-- Generated Reports -->
       </a>
     </div>
     <div class="col-12 col-md-6 col-lg-3 mb-4">
-      <a href="{% url 'students:all_reports' %}" class="d-flex flex-column align-items-center justify-content-center {% if request.resolver_match.url_name == 'all_reports' %}active{% endif %}">
+      <a href="{% url 'students:all_reports' %}" class="d-flex flex-column align-items-center justify-content-center  {% if request.resolver_match.url_name == 'all_reports' %}active{% endif %}" style="text-decoration: none;">
         <i class="fas fa-clipboard-list fa-4x text-primary mb-3"></i>
-        <span class="text-center text-uppercase font-weight-bold">All Reports</span>
+        <span class="text-center text-uppercase font-weight-bold" style="font-size: 18px;"> إحصائيات إجمالية</span><!-- All Reports -->
       </a>
     </div>
     <div class="col-12 col-md-6 col-lg-3 mb-4">
-      <a href="{% url 'students:daily_report' %}" class="d-flex flex-column align-items-center justify-content-center {% if request.resolver_match.url_name == 'daily_report' %}active{% endif %}">
+      <a href="{% url 'students:daily_report' %}" class="d-flex flex-column align-items-center justify-content-center  {% if request.resolver_match.url_name == 'daily_report' %}active{% endif %}" style="text-decoration: none;">
         <i class="fas fa-calendar-day fa-4x text-secondary mb-3"></i>
-        <span class="text-center text-uppercase font-weight-bold">Daily Report</span>
+        <span class="text-center text-uppercase font-weight-bold" style="font-size: 18px;"> تقرير يومي</span> <!-- Daily Report -->
       </a>
     </div>
     <div class="row justify-content-center">
     <div class="col-12 col-md-6 col-lg-3 mb-4">
-      <a href="{% url 'students:upgrade_students' %}" class="d-flex flex-column align-items-center justify-content-center {% if request.resolver_match.url_name == 'upgrade-students' %}active{% endif %}">
+      <a href="{% url 'students:upgrade_students' %}" class="d-flex flex-column align-items-center justify-content-center  {% if request.resolver_match.url_name == 'upgrade-students' %}active{% endif %}" style="text-decoration: none;">
         <i class="fas fa-graduation-cap fa-4x text-success mb-3"></i>
-        <span class="text-center text-uppercase font-weight-bold">Upgrade Students</span>
+        <span class="text-center text-uppercase font-weight-bold" style="font-size: 18px;">Upgrade Students</span>
       </a>
     </div>
     {% if user.is_authenticated %}

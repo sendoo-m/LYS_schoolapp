@@ -81,9 +81,10 @@ def search_student(request):
     context = {
         'students': page_obj,
         'query': query,
-        'page_obj': page_obj,  # Add this line to include the page_obj in the context
+        'page_obj': page_obj,
     }
     return render(request, 'students/search_student.html', context)
+
 
 
 @never_cache

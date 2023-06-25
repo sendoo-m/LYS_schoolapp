@@ -115,7 +115,7 @@ class Student(models.Model):
     classroom = models.ManyToManyField(Classroom)
     total_payments = models.DecimalField(max_digits=8, decimal_places=2, default=0, null=True, blank=True)
     total_owed = models.DecimalField(max_digits=8, decimal_places=2, default=0, null=True, blank=True)
-
+    phone_number = models.CharField(max_length=20, default='')  # Add the phone number field
     def __str__(self):
         return self.name
 

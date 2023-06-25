@@ -1,12 +1,12 @@
 {% extends 'students/base.html' %}
 {% load crispy_forms_tags %}
 
-{% block title %}Pay Installment{% endblock %}
+{% block title %}دفع الأقساط{% endblock %}
 
 {% block content %}
-    <h1>Pay Installment</h1>
-    <p>Student Name: {{ student_name }}</p>  <!-- Display the student's name -->
-    <p>National Number: {{ national_number }}</p>  <!-- Display the student's national number -->
+    <h1>دفع الأقساط</h1>
+    <p>اسم الطالب: {{ student_name }}</p>  <!-- Display the student's name -->
+    <p>الرقم القومي: {{ national_number }}</p>  <!-- Display the student's national number -->
 
     {% comment %} {% if messages %}
     {% for message in messages %}

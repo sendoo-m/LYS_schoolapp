@@ -44,62 +44,33 @@ class StudentForm(forms.ModelForm):
                 message='National number must be a 14-digit number',
             ),
         ],
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'maxlength': '14',
+        })
     )
 
     age = forms.IntegerField(
         validators=[
             MinValueValidator(3, message='Age must be between 3 and 17 years.'),
             MaxValueValidator(17, message='Age must be between 3 and 17 years.'),
-        ]
+        ],
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'maxlength': '2',
+        })
+    )
+    
+
+    phone_number = forms.CharField(
+        label='Phone number',
+        max_length=11,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'maxlength': '11',
+        })
     )
 
-
-    def save(self, commit=True):
-        instance = super().save(commit=False)
-        # Perform any necessary modifications to the instance object here
-        if commit:
-            instance.save()
-            self.save_m2m()
-        return instance
-    
-
-    def save(self, commit=True):
-        instance = super().save(commit=False)
-        # Perform any necessary modifications to the instance object here
-        if commit:
-            instance.save()
-            self.save_m2m()
-        return instance
-
-    class Meta:
-        model = Student
-        fields = '__all__'
-        widgets = {
-            'date_of_birth': forms.DateInput(attrs={'type': 'date'})
-        }
-
-
-    def calculate_age(date_of_birth):
-        today = date.today()
-        age = today.year - date_of_birth.year
-        if today.month < date_of_birth.month or (today.month == date_of_birth.month and today.day < date_of_birth.day):
-            age -= 1
-        return age
-    
-    class Meta:
-        model = Student
-        fields = '__all__'
-        widgets = {
-            'date_of_birth': forms.DateInput(attrs={'type': 'date'})
-        }
-
-    def __init__(self,  *args, **kwargs):
-        super(StudentForm, self).__init__(*args, **kwargs)
-        # HTML attributes:
-            # Max Length, user physically couldn't type more than 35
-            # some fields also can have the `pattern` attribute which allows you to have REGEX
-        self.fields['national_number'].widget.attrs={'class': 'form-control', 'maxlength': '14'}
-    
     classroom = forms.ModelChoiceField(
         queryset=Classroom.objects.all(), 
         label='Classroom', 
@@ -109,10 +80,25 @@ class StudentForm(forms.ModelForm):
         })
     )
 
+    class Meta:
+        model = Student
+        fields = '__all__'
+        widgets = {
+            'date_of_birth': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+        }
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        # Perform any necessary modifications to the instance object here
+        if commit:
+            instance.save()
+            self.save_m2m()
+        return instance
+    
 class Student_edit_Form(forms.ModelForm):
     class Meta:
         model = Student
-        fields = ['name', 'national_number', 'gender', 'age', 'date_of_birth', 'classroom']
+        fields = ['name', 'national_number', 'phone_number', 'gender', 'age', 'date_of_birth', 'classroom']
 
 
 class StudentSearchForm(forms.Form):
@@ -159,13 +145,6 @@ class StudentSearchForm(forms.Form):
     )
 
 
-# class ExpenseForm(forms.ModelForm):
-#     class Meta:
-#         model = Expense
-#         fields = ['expense_type', 'amount', 'date']
-#         widgets = {
-#             'date': forms.DateInput(attrs={'type': 'date'})
-#         }
 class ExpenseForm(forms.ModelForm):
     date = forms.DateField(
         label='Date',
@@ -186,7 +165,9 @@ class TuitionForm(forms.ModelForm):
         instance = getattr(self, 'instance', None)
         if instance and instance.pk:
             self.fields['receipt_date'].disabled = True
-
+        self.fields['installment_number'].label = 'رقم الايصال'
+        self.fields['amount_tuition'].label = 'مبلغ القسط'
+        self.fields['payment_user'].label = 'مسؤل الحسابات'
 
 
 class SignUpForm(UserCreationForm):
