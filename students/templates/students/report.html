@@ -25,6 +25,7 @@
                         <tr>
                             <th>Educational Stage</th>
                             <th>Number of Students</th>
+                            <th>Stage Expenses</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -32,33 +33,21 @@
                             <tr class="{% cycle 'table-secondary' 'table-white' %}">
                                 <td>{{ stage_stat.stage.name }}</td>
                                 <td>{{ stage_stat.total_stage_students }}</td>
+                                <td>
+                                    {% for expense in stage_stat.expenses %}
+                                        {{ expense.amount }}
+                                    {% empty %}
+                                        No expenses found.
+                                    {% endfor %}
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+                
+                
             </div>
         </div>
     </div>
-    <h2>Expenses by Educational Stage</h2>
-    <form method="GET">
-        <label for="stage_id">Select an Educational Stage:</label>
-        <select id="stage_id" name="stage_id">
-            {% for stage in stages %}
-                <option value="{{ stage.id }}">{{ stage.name }}</option>
-            {% endfor %}
-        </select>
-        <button type="submit">Get Report</button>
-    </form>
-
-    {% if expenses %}
-        <h3>Expenses for {{ selected_stage.name }}</h3>
-        <ul>
-            {% for expense in expenses %}
-                <li>{{ expense.description }} - ${{ expense.amount }}</li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No expenses found for this educational stage.</p>
-    {% endif %}
-
+    
 {% endblock %}

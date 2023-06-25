@@ -1,4 +1,6 @@
-{% extends 'students/base.html' %}
+{% extends 'students/base/student_affairs_navbar.html' %}
+
+{% comment %} {% extends 'students/base.html' %} {% endcomment %}
 {% block title %}Students List{% endblock %}
 {% block content %}
     <h1>Students List</h1>
@@ -32,6 +34,8 @@
                     {{ search_form.classroom }}
                 </div>
                 <button type="submit" class="btn btn-primary">Search</button>
+                
+                <a href="{% url 'students:student_list' %}" class="btn btn-secondary  ml-2">Clear</a>
             </form>
             <br >
         </div>

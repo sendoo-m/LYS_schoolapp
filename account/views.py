@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm
-from django.contrib.auth import login, authenticate, update_session_auth_hash
+from django.contrib.auth import login, authenticate, update_session_auth_hash, logout
 from django.views.generic import TemplateView
 from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView
 
@@ -67,10 +67,17 @@ def login_view(request):
         if form.is_valid():
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
+            user = authenticate(request, username=username, password=password)
             if user is not None:
-                auth_login(request, user)
-                return redirect('/')  # Replace 'home' with the name of your homepage URL
+                login(request, user)
+                if user.department == 'student_affairs':
+                    return redirect('students:student_affairs_home')
+                elif user.department == 'administration':
+                    return redirect('students:administration_home')
+                elif user.department == 'accounts':
+                    return redirect('students:accounts_home')
+                else:
+                    return redirect('students:home')  # Replace 'home' with the name of your default homepage URL
     else:
         form = AuthenticationForm()
     
@@ -122,22 +129,30 @@ def view_profile(request):
 
 # =================== logout  ===================
 
-from django.contrib.auth import logout
-from django.shortcuts import redirect
+# from django.contrib.auth import logout
+# from django.shortcuts import redirect, render
 
-def custom_logout(request):
-    if request.user.is_staff:  # Check if the user is an admin
-        return redirect('admin:index')  # Redirect to the admin page
-    else:
-        return redirect('students:home')  # Redirect to the home page
+# def custom_logout(request):
+#     logout(request)  # Log out the user
+#     # if request.user.is_staff:  # Check if the user is an admin
+#     #     return redirect('account:admin_logout')  # Redirect to the admin logout page
+#     # else:
+#     return redirect('account:logout')  # Redirect to the frontend logout page
+
+
+# def admin_logout(request):
+#     # Perform any necessary logout logic for admin
+#     return redirect('admin:index')  # Redirect to the admin page after logout
+
+
 
 # =================== logout  ===================
 
-def students_view(request):
-    user = request.user
-    is_administration = user.groups.filter(name='Administration').exists()
-    # Pass the `is_administration` variable to the template context
-    context = {
-        'is_administration': is_administration
-    }
-    return render(request, 'students/home.html', context)
+# def students_view(request):
+#     user = request.user
+#     is_administration = user.groups.filter(name='Administration').exists()
+#     # Pass the `is_administration` variable to the template context
+#     context = {
+#         'is_administration': is_administration
+#     }
+#     return render(request, 'students/home.html', context)

@@ -71,14 +71,15 @@ class StudentForm(forms.ModelForm):
         })
     )
 
-    classroom = forms.ModelChoiceField(
+    classroom = forms.ModelMultipleChoiceField(
         queryset=Classroom.objects.all(), 
         label='Classroom', 
         required=False,
-        widget=forms.Select(attrs={
+        widget=forms.SelectMultiple(attrs={
             'class': 'form-control',
         })
     )
+
 
     class Meta:
         model = Student

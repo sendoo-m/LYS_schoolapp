@@ -201,7 +201,7 @@
               <a class="nav-link" href="{% url 'account:change_password' %}">Change Password</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'account:logout' %}">Log out</a>
+              <a class="nav-link" href="{% url 'logout' %}">Log out</a>
             </li>
           {% else %}
             <li class="nav-item">
@@ -216,40 +216,8 @@
     </div>
   </nav>
 <div class="container py-4">
-     {% comment %} <!-- Content for Administration -->
-      {% if is_administration %}
-      <div class="administrators-section">
-          <h1>Administrators</h1>
-          <p>Terms and conditions for administrators go here...</p>
-          <!-- Additional content specific to administrators -->
-          {% block administrators_content %}
-          {% endblock %}
-      </div>
-      <!-- Content for Administration -->
-      {% endif %}
-
-
-      <!-- Content for Student Affairs -->
-      {% if user.groups.filter(name='student_affairs').exists %}
-      <div class="student-affairs-section">
-          <h1>Student Affairs</h1>
-          <p>Terms and conditions for student affairs go here...</p>
-          <!-- Additional content specific to student affairs -->
-          {% block student_affairs_content %}
-          {% endblock %}
-      </div>
-      {% endif %}
-
-      <!-- Content for Accounts -->
-      {% if user.groups.filter(name='accounts').exists %}
-      <div class="accounts-section">
-          <h1>Accounts</h1>
-          <p>Terms and conditions for accounts go here...</p>
-          <!-- Additional content specific to accounts -->
-          {% block accounts_content %}
-          {% endblock %}
-      </div>
-      {% endif %} {% endcomment %}
+     
+   
 
     {% block content %}
     {% endblock %}

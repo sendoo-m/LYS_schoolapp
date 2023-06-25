@@ -21,6 +21,7 @@ from django.conf.urls.static import static
 from students import urls as students_urls
 from report import urls as report_urls
 from account import urls as account_urls
+from django.contrib.auth import views as auth_views
 
 from django.views.generic.base import RedirectView
 
@@ -30,4 +31,6 @@ urlpatterns = [
     path('students/', include(students_urls)),
     path('report/', include(report_urls)),
     path('', include(account_urls)),
+    path('logout/', auth_views.LogoutView.as_view(template_name='account/logout.html'),
+         name='logout'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

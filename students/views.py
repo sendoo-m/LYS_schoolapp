@@ -15,16 +15,46 @@ from datetime import timedelta
 @never_cache
 @login_required
 def home(request):
-    students = Student.objects.all()
-    paginator = Paginator(students, 10)  # Display 10 students per page
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    user = request.user
+    if user.department == 'accounts':
+        return redirect('accounts_home')
+    elif user.department == 'student_affairs':
+        return redirect('student_affairs_home')
+    elif user.department == 'administration':
+        return redirect('administration_home')
+    else:
+        students = Student.objects.all()
+        paginator = Paginator(students, 10)  # Display 10 students per page
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
 
+        context = {
+            'students': page_obj,
+            'page_obj': page_obj,  # Pass the page_obj variable to the template
+        }
+        return render(request, 'students/home.html', context)
+
+@never_cache
+@login_required
+def accounts_home(request):
+    
+    return render (request, 'students/accounts_home.html')
+
+
+@never_cache
+@login_required
+def student_affairs_home(request):
+    return render(request, 'students/student_affairs_home.html')
+
+
+@never_cache
+@login_required    
+def administration_home(request):
     context = {
-        'students': page_obj,
-        'page_obj': page_obj,  # Pass the page_obj variable to the template
+        
     }
-    return render(request, 'students/home.html', context)
+    return render (request, 'students/administration_home.html', context)
+
 
 @never_cache
 @login_required
@@ -342,16 +372,27 @@ def report(request):
     # Total female students
     total_female_students = Student.objects.filter(gender='F').count()
 
-    # Statistics appear for each educational stage
     stages = Classroom.objects.all()
     stage_stats = []
     for stage in stages:
         stage_students = Student.objects.filter(classroom=stage)
         total_stage_students = stage_students.count()
+
+        # Total tuition paid for the stage
         paid_stage_tuitions = Tuition.objects.filter(student__in=stage_students, paid=True).aggregate(Sum('amount_tuition'))['amount_tuition__sum'] or 0
+
+        # The total number of students in the stage who did not pay
         unpaid_stage_students = stage_students.exclude(tuitions__paid=True).count()
+
+        # Total male students in the stage
         male_stage_students = stage_students.filter(gender='M').count()
+
+        # Total female students in the stage
         female_stage_students = stage_students.filter(gender='F').count()
+
+        # Get expenses for the stage
+        expenses = Expense.objects.filter(classroom=stage)
+
         stage_stats.append({
             'stage': stage,
             'total_stage_students': total_stage_students,
@@ -359,24 +400,17 @@ def report(request):
             'unpaid_stage_students': unpaid_stage_students,
             'male_stage_students': male_stage_students,
             'female_stage_students': female_stage_students,
+            'expenses': expenses,
         })
 
-    # Show statistics for all data on the application
+    # Total tuition across all stages
     total_tuitions = Tuition.objects.aggregate(Sum('amount_tuition'))['amount_tuition__sum'] or 0
-    total_paid_students = Student.objects.filter(tuitions__paid=True).count()
-    total_unpaid_tuitions = Tuition.objects.filter(paid=False).aggregate(Sum('amount_tuition'))['amount_tuition__sum'] or 0
 
-    # Handle form submission and retrieve expenses for the selected stage
-    selected_stage = None
-    expenses = []
-    if request.method == 'GET':
-        stage_id = request.GET.get('stage_id')
-        if stage_id:
-            try:
-                selected_stage = Classroom.objects.get(id=stage_id)
-                expenses = Expense.objects.filter(classroom=selected_stage)
-            except Classroom.DoesNotExist:
-                pass
+    # Total number of students who have paid tuition
+    total_paid_students = Student.objects.filter(tuitions__paid=True).count()
+
+    # Total unpaid tuitions
+    total_unpaid_tuitions = Tuition.objects.filter(paid=False).aggregate(Sum('amount_tuition'))['amount_tuition__sum'] or 0
 
     context = {
         'registered_students': registered_students,
@@ -388,9 +422,6 @@ def report(request):
         'total_tuitions': total_tuitions,
         'total_paid_students': total_paid_students,
         'total_unpaid_tuitions': total_unpaid_tuitions,
-        'stages': stages,
-        'selected_stage': selected_stage,
-        'expenses': expenses,
     }
 
     return render(request, 'students/report.html', context)
