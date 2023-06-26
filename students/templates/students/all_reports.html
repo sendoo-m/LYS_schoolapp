@@ -1,4 +1,4 @@
-{% extends 'students/base.html' %}
+{% extends 'students/base/administration_navbar.html' %}
 {% block title %}All Reports{% endblock %}
 
 {% block content %}
@@ -78,6 +78,7 @@
               <th>Classroom</th>
               <th>Total Students</th>
               <th>Total Fees Due</th>
+              <th>Total discounts</th>
               {% comment %} <th>Paid Students</th>
               <th>Unpaid Students</th> {% endcomment %}
               <th>Remaining Tuitions</th>
@@ -95,6 +96,8 @@
                 
                 <td>{{ classroom_stat.total_students }}</td>
                 <td>{{ classroom_stat.total_fees_due }}</td>
+                <td>{{ classroom_stat.total_discounts }}</td>
+                
                 {% comment %} <td>{{ classroom_stat.total_paid_students }}</td> {% endcomment %}
                 {% comment %} <td>
                   {% if classroom_stat.unpaid_students_link %}

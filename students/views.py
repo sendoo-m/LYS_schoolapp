@@ -1,3 +1,4 @@
+import decimal
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -9,7 +10,9 @@ from django.db.models import Q
 from datetime import date
 from django.db.models import Sum, F, ExpressionWrapper, DecimalField, Case, When, F, IntegerField
 from datetime import timedelta
-
+from decimal import Decimal
+from reportlab.pdfgen import canvas
+from django.http import HttpResponse
 
 # Create your views here.
 @never_cache
@@ -321,6 +324,7 @@ def delete_installment(request, pk):
         tuition.delete()
     return redirect('students:student_detail', pk=tuition.student.pk)  # Use student.pk instead of tuition.student.pk
 
+
 @never_cache
 @login_required
 def student_detail(request, pk):
@@ -330,6 +334,19 @@ def student_detail(request, pk):
     classroom = student.classroom.first()  # retrieve the first classroom for the student
     expenses = Expense.objects.filter(classroom=classroom)
     total_expenses = sum(expense.amount for expense in expenses)
+
+    # Get the discount for the student
+    discount = student.discount
+
+    # Deduct the discount if it exists
+    if discount and discount != 'NONE':
+        for expense in expenses:
+            total_expenses -= student.get_discounted_amount()
+            expense.discounted_amount = student.get_discounted_amount()
+    else:
+        for expense in expenses:
+            expense.discounted_amount = 0
+
     total_owed = total_expenses - total_paid
 
     if request.method == 'POST':
@@ -337,6 +354,11 @@ def student_detail(request, pk):
         payment_amount = request.POST.get('payment_amount')
         if payment_amount:
             payment_amount = float(payment_amount)
+
+            # Apply the student discount if it exists
+            if discount:
+                payment_amount -= discount
+
             # Update the installment as paid
             # Assuming you have a logic to mark an installment as paid, e.g., changing the 'paid' field to True
             # Update the 'total_payments' field in the associated student
@@ -350,6 +372,7 @@ def student_detail(request, pk):
         'expenses': expenses,
         'total_expenses': total_expenses,
         'total_owed': total_owed,
+        'discount': discount,  # Add the discount to the context
     }
     return render(request, 'students/student_detail.html', context)
 
@@ -427,6 +450,7 @@ def report(request):
     return render(request, 'students/report.html', context)
 
 
+# its work niecly after discount 
 
 @never_cache
 @login_required
@@ -438,6 +462,7 @@ def all_reports(request):
     total_fees_due *= total_students
     paid_students = Student.objects.filter(tuitions__paid=True).distinct().count()
     total_fees_paid = Tuition.objects.filter(paid=True).aggregate(total=Sum('amount_tuition'))['total'] or 0
+    total_discounts = Student.objects.aggregate(total_discounts=Sum('discount'))['total_discounts'] or 0
 
     classroom_stats = []
     classrooms = Classroom.objects.all()
@@ -454,21 +479,26 @@ def all_reports(request):
         total_remaining_tuitions = (Expense.objects.filter(classroom=classroom).aggregate(total_expense=Sum('amount'))['total_expense'] or 0) * total_students_classroom
         total_remaining_tuitions -= total_fees_due_classroom
 
+        # Calculate total discounts for the classroom
+        total_discounts_classroom = sum(student.get_discounted_amount() for student in classroom.student_set.all())
+
         classroom_stat = {
             'classroom': classroom,
             'total_students': total_students_classroom,
             'total_fees_due': total_fees_due_classroom,
             'total_paid_students': total_paid_students,
             'total_unpaid_students': total_unpaid_students,
-            'remaining_tuitions': total_remaining_tuitions,
+            'total_discounts': total_discounts_classroom,  # Use total_discounts_classroom instead of sum(student.get_discounted_amount()...)
+            'remaining_tuitions': total_remaining_tuitions - total_discounts_classroom,  # Apply the discounts to remaining_tuitions
         }
         classroom_stats.append(classroom_stat)
 
-    # Calculate total_remaining
+    # Calculate total_remaining with discounts applied
     total_remaining = sum(classroom['remaining_tuitions'] for classroom in classroom_stats)
-    
+
     # Calculate total_fees_due
     total_fees_due = sum(classroom['total_fees_due'] for classroom in classroom_stats)
+
     context = {
         'total_students': total_students,
         'total_installments_paid': total_installments_paid,
@@ -477,24 +507,18 @@ def all_reports(request):
         'unpaid_students': total_students - paid_students,
         'total_remaining': total_remaining,
         'classroom_stats': classroom_stats,
+        'total_discounts': total_discounts,
     }
 
     return render(request, 'students/all_reports.html', context)
 
-
-
+# its work without export
 @never_cache
 @login_required
 def classroom_details(request, classroom_id):
     classroom = Classroom.objects.get(id=classroom_id)
     expenses = Expense.objects.filter(classroom=classroom)
-    total_expenses = expenses.aggregate(total_expenses=Sum('amount'))['total_expenses'] or 0
-
-    # Calculate total paid for the classroom
-    total_paid = Tuition.objects.filter(student__classroom=classroom, paid=True).aggregate(total=Sum('amount_tuition'))['total'] or 0
-
-    # Calculate total owed for the classroom
-    total_owed = total_expenses - total_paid
+    total_expenses = expenses.aggregate(total_expenses=Sum('amount'))['total_expenses'] or Decimal(0)
 
     # Get the search query from the request
     search_query = request.GET.get('search')
@@ -504,6 +528,14 @@ def classroom_details(request, classroom_id):
         students = classroom.student_set.filter(Q(name__icontains=search_query) | Q(national_number__icontains=search_query))
     else:
         students = classroom.student_set.all()
+
+    for student in students:
+        # Calculate total paid for each student
+        total_paid = student.total_payments or Decimal(0)  # Set default value to 0 if total_payments is None
+
+        # Calculate the discount for each student and subtract it from total owed
+        discount = student.get_discounted_amount()  # Obtain the discount amount from the student's method
+        student.total_owed = total_expenses - total_paid - discount
 
     # Paginate the students
     paginator = Paginator(students, 10)
@@ -515,11 +547,10 @@ def classroom_details(request, classroom_id):
         'page_obj': page_obj,
         'search_query': search_query,
         'total_expenses': total_expenses,
-        'total_owed': total_owed,
-        'total_paid': total_paid,
     }
 
     return render(request, 'students/classroom_details.html', context)
+
 
 
 

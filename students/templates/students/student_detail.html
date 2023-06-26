@@ -1,6 +1,7 @@
 {% extends 'students/base/account_navbar.html' %}
 {% comment %} {% extends 'students/base.html' %} {% endcomment %}
 {% load crispy_forms_tags %}
+{% load custom_filters %}
 
 {% block title %}{{ student.name }} - Student Detail{% endblock %}
 
@@ -24,21 +25,24 @@
 <!-- Display expenses -->
 {% comment %} <h2>المصاريف</h2> {% endcomment %}
 <div class="button " >
+    <h4 class="text-center text-primary">Discount: {{ discount }}</h4>
     <table class="table table-striped">
         <thead>
             <tr>
                 <th>المصاريف المدرسية</th>
                 <th>مبلغ</th>
                 <th>تاريخ رصد المبلغ</th>
+                <th>  خصم</th>
             </tr>
         </thead>
         <tbody>
             {% for expense in expenses %}
-                <tr>
-                    <td>{{ expense.expense_type }}</td>
-                    <td>{{ expense.amount }}</td>
-                    <td>{{ expense.date }}</td>
-                </tr>
+            <tr>
+                <td>{{ expense.expense_type }}</td>
+                <td>{{ expense.amount }}</td>
+                <td>{{ expense.date }}</td>
+                <td>{{ expense.discounted_amount }}</td>
+            </tr>
             {% endfor %}
         </tbody>
     </table>
@@ -111,16 +115,17 @@
                 <td colspan="2"><strong>Total Owed:</strong></td>
                 <td colspan="4">
                     <strong style="color: {% if total_owed > 0 %}red{% elif total_owed < 0 %}green{% else %}green{% endif %}">
-                {% if total_owed > 0 %}
-                    {{ total_owed }}
-                {% elif total_owed < 0 %}
-                    Paid over
-                    {{ total_owed }}<!--|abs--> 
-                {% else %}
-                    0
-                {% endif %}
-                </strong>
+                        {% if total_owed > 0 %}
+                            {{ total_owed }}
+                        {% elif total_owed < 0 %}
+                            Paid over
+                            {{ total_owed|abs_value }} 
+                        {% else %}
+                            0
+                        {% endif %}
+                    </strong>
                 </td>
+
             </tr>
            
         </tbody>
