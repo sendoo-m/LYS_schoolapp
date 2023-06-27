@@ -20,7 +20,7 @@
     <div class="row">
         <div class="col-md-8 mx-auto">
             <h1 class="mb-4">Receipt</h1>
-            <table class="table table-bordered">
+            <table class="table table-bordered"> <!--  -->
                 <tbody>
                     <tr>
                         <th>Payment Date:</th>
@@ -42,21 +42,20 @@
                         <th>Amount Paid:</th>
                         <td>{{ tuition.amount_tuition }}</td>
                        
-                                </tr>
-                                <tr>
-                                    <th>Amount Remaining:</th>
-                                    <td>
-                                        {% if total_owed > 0 %}
-                                            {{ total_owed }}
-                                        {% elif total_owed < 0 %}
-                                            Paid over
-                                            {{ total_owed }}<!--|absolute -->
-                                        {% else %}
-                                            0
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            </tbody>
+                    </tr>
+                    <tr>
+                        <th>Amount Remaining:</th>
+                        <td>
+                            {% if total_owed > 0 %}
+                                {{ total_owed }}
+                            {% elif total_owed < 0 %}
+                                Paid over
+                                {{ total_owed }}<!--|absolute -->
+                            {% else %}
+                                0
+                            {% endif %}
+                        </td>
+                    </tr>
                 </tbody>
             </table>
             <button class="btn btn-primary print-button" onclick="printReceipt()">Print</button>

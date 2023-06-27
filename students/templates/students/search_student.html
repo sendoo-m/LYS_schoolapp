@@ -5,7 +5,7 @@
 
 
 {% block content %}
-  <div class="container my-5">
+  <div class="container my-1">
     <h1>Search Students</h1>
     <form method="GET" action="{% url 'students:search_student' %}">
       <div class="input-group mb-3">
@@ -17,8 +17,8 @@
     {% if students %}
       <h2>Search Results</h2>
       <div class="table-responsive">
-        <table class="table table-bordered">
-          <thead class="bg-primary text-white">
+        <table> <!--  class="table table-bordered"  -->
+          <thead ><!-- class="bg-primary text-white" -->
             <tr>
               <th>Name</th>
               <th>National Number</th>

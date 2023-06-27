@@ -27,3 +27,52 @@
   }
 }
 
+
+  /* Define a CSS style for the table */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    /* max-width: 800px;  */
+    margin: 0 auto;
+  }
+
+  /* Define CSS styles for the table header */
+  th {
+    background-color: #337ab7;
+    color: white;
+    font-weight: bold;
+    text-align: left;
+    padding: 12px;
+  }
+
+  /* Define CSS styles for the table data */
+  td {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+
+  /* Define CSS styles for the even rows */
+  tr:nth-child(even) td {
+    background-color: #f2f2f2;
+  }
+
+  /* Define CSS styles for the print button */
+  .print-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 20px;
+  }
+  /* Hide the button on the print paper */
+  @media print {
+    .print-button {
+      display: none;
+    }
+  }
+  @media print {
+      footer {
+          display: none;
+      }
+  }

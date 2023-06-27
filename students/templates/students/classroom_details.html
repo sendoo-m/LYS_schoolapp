@@ -154,13 +154,37 @@
         <form method="GET" action="{% url 'students:classroom_details' classroom.id %}" class="d-flex">
           <input type="text" name="search" class="form-control me-2" placeholder="Search students" value="{{ search_query }}">
           <button type="submit" class="btn btn-primary">Search</button>
+          <a href="{% url 'students:classroom_details' classroom.id  %}" class="btn btn-secondary ms-1" title="Refresh">
+            <i class="fas fa-sync-alt"></i>
+            </a>
         </form>
       </div>
     </div>
   <button class="print-button" onclick="printTable()">Print</button>
   
   <!-- Add the sort button -->
-  <button onclick="sortTable()">Sort by Total Paid</button>
+  {% comment %} <button onclick="sortTable()">Sort by Total Paid</button> {% endcomment %}
+<!-- Filter -->
+<div class="row">
+  <form method="GET" class="mt-5 mb-2">
+    <div class="btn-group wd-100" role="group" aria-label="Basic radio toggle button group">
+      <!-- Total Owed -->
+      <input type="hidden" name="search" value="{{ search_query }}">
+      
+      <button type="submit" class="btn {% if is_paid is None %} btn-danger {% else %} btn-outline-secondary {% endif %}" name="is_paid" value="">All</button>
+      <button type="submit" class="btn {% if is_paid == 'paid' %} btn-danger {% else %} btn-outline-secondary {% endif %}" name="total_owed" value="paid">Total Owed Done</button>
+      <button type="submit" class="btn {% if is_paid == 'unpaid' %} btn-danger {% else %} btn-outline-secondary {% endif %}" name="total_owed" value="unpaid">Total Owed Need</button>     
+    </div>
+    <br>
+  </form>
+</div>
+<!-- end filter -->
+
+
+
+    </form>
+  </div>
+  
 
   <div id="printable-table">
     <!-- Display students with pagination --> 

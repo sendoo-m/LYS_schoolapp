@@ -14,6 +14,7 @@ from decimal import Decimal
 from reportlab.pdfgen import canvas
 from django.http import HttpResponse
 
+
 # Create your views here.
 @never_cache
 @login_required
@@ -288,20 +289,23 @@ def comment_list(request):
     comments = Comment.objects.all()
     return render(request, 'comment_list.html', {'comments': comments})
 
+
 @never_cache
 @login_required
 def receipt(request, pk):
     tuition = get_object_or_404(Tuition, pk=pk)
-    student = tuition.student  # Retrieve the student from the tuition object
+    student = tuition.student
     installments = Tuition.objects.filter(student=student)
     total_paid = sum(installment.amount_tuition for installment in installments if installment.paid)
-    classroom = student.classroom.first()  # Retrieve the first classroom for the student
+    classroom = student.classroom.first()
     expenses = Expense.objects.filter(classroom=classroom)
     total_expenses = sum(expense.amount for expense in expenses)
-    total_owed = total_expenses - total_paid
+    discount = student.get_discounted_amount()  # Obtain the discount amount from the student's method
+    total_owed = total_expenses - total_paid - discount  # Apply the discount to the total owed calculation
+
     if not tuition.paid:
         messages.warning(request, 'This installment has not been paid yet.')
-        return redirect('student_detail', pk=student.pk)  # Use student.pk instead of tuition.student.pk
+        return redirect('student_detail', pk=student.pk)
     else:
         context = {
             'tuition': tuition,
@@ -309,10 +313,10 @@ def receipt(request, pk):
             'total_paid': total_paid,
             'expenses': expenses,
             'total_expenses': total_expenses,
+            'discount': discount,  # Pass the discount to the template
             'total_owed': total_owed,
         }
         return render(request, 'students/receipt.html', context)
-
 
 @never_cache
 @login_required
@@ -513,6 +517,100 @@ def all_reports(request):
     return render(request, 'students/all_reports.html', context)
 
 # its work without export
+# @never_cache
+# @login_required
+# def classroom_details(request, classroom_id):
+#     classroom = Classroom.objects.get(id=classroom_id)
+#     expenses = Expense.objects.filter(classroom=classroom)
+#     total_expenses = expenses.aggregate(total_expenses=Sum('amount'))['total_expenses'] or Decimal(0)
+
+#     # Get the search query from the request
+#     search_query = request.GET.get('search')
+
+#     # Filter students based on the search query
+#     if search_query:
+#         students = classroom.student_set.filter(Q(name__icontains=search_query) | Q(national_number__icontains=search_query))
+#     else:
+#         students = classroom.student_set.all()
+
+    
+#     for student in students:
+#         # Calculate total paid for each student
+#         total_paid = student.total_payments or Decimal(0)  # Set default value to 0 if total_payments is None
+
+#         # Calculate the discount for each student and subtract it from total owed
+#         discount = student.get_discounted_amount()  # Obtain the discount amount from the student's method
+#         student.total_owed = total_expenses - total_paid - discount
+
+#     # Paginate the students
+#     paginator = Paginator(students, 10)
+#     page_number = request.GET.get('page')
+#     page_obj = paginator.get_page(page_number)
+
+#     context = {
+#         'classroom': classroom,
+#         'page_obj': page_obj,
+#         'search_query': search_query,
+#         'total_expenses': total_expenses,
+#     }
+
+#     return render(request, 'students/classroom_details.html', context)
+
+# from decimal import Decimal
+
+# @never_cache
+# @login_required
+# def classroom_details(request, classroom_id):
+#     classroom = Classroom.objects.get(id=classroom_id)
+#     expenses = Expense.objects.filter(classroom=classroom)
+#     total_expenses = expenses.aggregate(total_expenses=Sum('amount'))['total_expenses'] or Decimal(0)
+
+#     # Global filter
+#     if request.method == 'POST':
+#         stotal_owed = request.POST.get('stotal_owed')
+#         gender = request.POST.get('gender')
+#         students = classroom.student_set.filter(total_owed__gt=0)  # Filter students with total_owed greater than 0
+       
+#         if stotal_owed == 'paid':
+#             students = students.filter(total_owed=0)  # Filter students with total_owed equals to 0
+#         elif stotal_owed == 'unpaid':
+#             students = students.exclude(total_owed=0)  # Filter students with total_owed not equal to 0
+
+#         if gender:
+#             students = students.filter(gender=gender)
+
+#         search_query = request.GET.get('search')
+
+#         if search_query:
+#             students = students.filter(Q(name__icontains=search_query) | Q(national_number__icontains=search_query))
+
+#     else:
+#         search_query = request.GET.get('search')
+#         students = classroom.student_set.all()
+
+#         if search_query:
+#             students = students.filter(Q(name__icontains=search_query) | Q(national_number__icontains=search_query))
+
+#     for student in students:
+#         total_paid = student.total_payments or Decimal(0)
+#         discount = student.get_discounted_amount()
+#         student.total_owed = total_expenses - total_paid - discount
+
+#     paginator = Paginator(students, 10)
+#     page_number = request.GET.get('page')
+#     page_obj = paginator.get_page(page_number)
+
+#     context = {
+#         'classroom': classroom,
+#         'page_obj': page_obj,
+#         'search_query': search_query,
+#         'total_expenses': total_expenses,
+#     }
+
+#     return render(request, 'students/classroom_details.html', context)
+
+from decimal import Decimal
+
 @never_cache
 @login_required
 def classroom_details(request, classroom_id):
@@ -520,24 +618,33 @@ def classroom_details(request, classroom_id):
     expenses = Expense.objects.filter(classroom=classroom)
     total_expenses = expenses.aggregate(total_expenses=Sum('amount'))['total_expenses'] or Decimal(0)
 
-    # Get the search query from the request
     search_query = request.GET.get('search')
+    students = classroom.student_set.all()
 
-    # Filter students based on the search query
     if search_query:
-        students = classroom.student_set.filter(Q(name__icontains=search_query) | Q(national_number__icontains=search_query))
-    else:
-        students = classroom.student_set.all()
+        students = students.filter(Q(name__icontains=search_query) | Q(national_number__icontains=search_query))
+
+    if request.method == 'POST':
+        total_owed = request.POST.get('is_paid')
+
+        if total_owed == 'paid':
+            students = students.filter(total_owed=Decimal(0))
+        elif total_owed == 'unpaid':
+            students = students.filter(total_owed__gt=Decimal(0))
 
     for student in students:
-        # Calculate total paid for each student
-        total_paid = student.total_payments or Decimal(0)  # Set default value to 0 if total_payments is None
-
-        # Calculate the discount for each student and subtract it from total owed
-        discount = student.get_discounted_amount()  # Obtain the discount amount from the student's method
+        total_paid = student.total_payments or Decimal(0)
+        discount = student.get_discounted_amount()
         student.total_owed = total_expenses - total_paid - discount
+        student.is_paid = True if student.total_owed == Decimal(0) else False
 
-    # Paginate the students
+    # Filter by total owed
+    is_paid = request.GET.get('is_paid')
+    if is_paid == '0':
+        students = students.filter(total_owed__gt=Decimal(0))
+    elif is_paid == '1':
+        students = students.filter(total_owed=Decimal(0))
+
     paginator = Paginator(students, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -547,9 +654,15 @@ def classroom_details(request, classroom_id):
         'page_obj': page_obj,
         'search_query': search_query,
         'total_expenses': total_expenses,
+        'is_paid': is_paid,
     }
 
     return render(request, 'students/classroom_details.html', context)
+
+
+
+
+
 
 
 

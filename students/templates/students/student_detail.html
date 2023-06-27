@@ -26,7 +26,7 @@
 {% comment %} <h2>المصاريف</h2> {% endcomment %}
 <div class="button " >
     <h4 class="text-center text-primary">Discount: {{ discount }}</h4>
-    <table class="table table-striped">
+    <table> <!--class="table table-striped"-->
         <thead>
             <tr>
                 <th>المصاريف المدرسية</th>
@@ -48,14 +48,15 @@
     </table>
 </div>
 <!-- ============================= chat GPT code ============================= -->
-    <h4 class='text-center text-primary'> الاقساط التي تم سدادها -  {{ student.name }}</h4>
+<br>    
+<h4 class='text-center text-primary'> الاقساط التي تم سدادها -  {{ student.name }}</h4>
     {% if messages %}
     {% for message in messages %}
       <div class="alert alert-{{ message.tags }}">{{ message }}</div>
     {% endfor %}
   {% endif %}
-    <a href="{% url 'students:pay_installment' pk=student.pk %}" class="btn btn-primary btn-sm">دفع قسط </a>
-    <table class="table">
+  <a href="{% url 'students:pay_installment' pk=student.pk %}" class="btn btn-success btn-lg px-4 py-2 rounded-pill">دفع قسط </a>
+      <table> <!-- class="table"-->
         <thead>
             <tr>
                 <th>Receipt Number</th>
