@@ -27,4 +27,6 @@ urlpatterns = [
     path('generate-installment-report/', views.generate_installment_report, name='generate_installment_report'),
     path('g-reports/', views.g_reports, name='g_reports'),
     path('upgrade-students/', views.upgrade_students_view, name='upgrade_students'),
+    path('dashboard/', views.student_dashboard, name='student_dashboard'),
+    path('export/', views.export_students, name='export_students'),
 ]

@@ -26,7 +26,7 @@ from django.contrib.auth import views as auth_views
 from django.views.generic.base import RedirectView
 
 urlpatterns = [
-    # path('', RedirectView.as_view(url='students/')),  # Redirect to students app
+    path('', RedirectView.as_view(url='students/')),  # Redirect to students app
     path('admin/', admin.site.urls),
     path('students/', include(students_urls)),
     path('report/', include(report_urls)),

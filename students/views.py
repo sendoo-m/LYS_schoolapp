@@ -780,3 +780,73 @@ def upgrade_students_view(request):
 
     # If it's a GET request, simply render the template without any message
     return render(request, 'students/upgrade_students.html')
+
+
+
+
+
+# ################################## Dashboeard ##################################
+
+# def student_dashboard(request):
+#     gender_filter = request.GET.get('gender')
+#     order_by = request.GET.get('order_by', 'name,total_payments,total_owed')
+
+#     students = Student.objects.all()
+
+#     if gender_filter:
+#         students = students.filter(gender=gender_filter)
+
+#     query = request.GET.get('q')
+#     if query:
+#         students = students.filter(
+#             Q(name__icontains=query) |
+#             Q(national_number__icontains=query) |
+#             Q(phone_number__icontains=query)
+#         )
+
+#     order_by_fields = order_by.split(",")  # Split the order_by values into a list
+
+#     students = students.order_by(*order_by_fields)  # Unpack the list using *
+
+#     context = {'students': students}
+#     return render(request, 'students/dashboard.html', context)
+
+from django.http import HttpResponse
+from tablib import Dataset
+from .resources import StudentResource
+
+def export_students(request):
+    student_resource = StudentResource()
+    dataset = student_resource.export()
+    response = HttpResponse(dataset.xlsx, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="students.xlsx"'
+    return response
+
+
+def student_dashboard(request):
+    gender_filter = request.GET.get('gender')
+    order_by = request.GET.get('order_by', 'name,total_payments,total_owed')
+
+    students = Student.objects.all()
+
+    if gender_filter:
+        students = students.filter(gender=gender_filter)
+
+    query = request.GET.get('q')
+    if query:
+        students = students.filter(
+            Q(name__icontains=query) |
+            Q(national_number__icontains=query) |
+            Q(phone_number__icontains=query)
+        )
+
+    order_by_fields = order_by.split(",")
+
+    students = students.order_by(*order_by_fields)
+
+    paginator = Paginator(students, 10)  # 10 students per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {'page_obj': page_obj}
+    return render(request, 'students/dashboard.html', context)
