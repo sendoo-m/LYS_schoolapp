@@ -13,7 +13,8 @@ from datetime import timedelta
 from decimal import Decimal
 from reportlab.pdfgen import canvas
 from django.http import HttpResponse
-
+from tablib import Dataset
+from .resources import StudentResource
 
 # Create your views here.
 @never_cache
@@ -811,9 +812,6 @@ def upgrade_students_view(request):
 #     context = {'students': students}
 #     return render(request, 'students/dashboard.html', context)
 
-from django.http import HttpResponse
-from tablib import Dataset
-from .resources import StudentResource
 
 def export_students(request):
     student_resource = StudentResource()
