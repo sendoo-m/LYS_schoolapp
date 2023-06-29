@@ -34,7 +34,7 @@ def home(request):
 
         context = {
             'students': page_obj,
-            'page_obj': page_obj,  # Pass the page_obj variable to the template
+            'page_obj': page_obj,  # Pass the page_obj variable to the template 
         }
         return render(request, 'students/home.html', context)
 

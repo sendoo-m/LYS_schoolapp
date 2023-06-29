@@ -52,14 +52,15 @@ class ClassroomAdmin(admin.ModelAdmin):
 class StudentResource(resources.ModelResource):
     class Meta:
         model = Student
-        fields = ('name', 'gender', 'date_of_birth', 'academic_year', 'classroom', 'national_number')
+        fields = ('name', 'gender', 'date_of_birth', 'academic_year', 'classroom', 'national_number', 'total_payments', 'total_owed', 'phone_number')
+
 
 @admin.register(Student)
 class StudentAdmin(ImportExportMixin, admin.ModelAdmin):
     resource_class = StudentResource
-    list_display = ('name', 'national_number', 'age', 'gender', 'date_of_birth')
-    list_filter = ('gender', 'classroom__educational_stage')
-    search_fields = ('name', 'national_number')
+    list_display = ('name', 'national_number', 'age', 'total_payments', 'total_owed', 'phone_number')
+    list_filter = ('gender', 'classroom__educational_stage' , 'total_owed')
+    search_fields = ('name', 'national_number', 'classroom')
 
 
 @admin.register(Expense)

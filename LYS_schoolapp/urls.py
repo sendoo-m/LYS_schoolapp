@@ -26,11 +26,10 @@ from django.contrib.auth import views as auth_views
 from django.views.generic.base import RedirectView
 
 urlpatterns = [
-    path('', RedirectView.as_view(url='students/')),  # Redirect to students app
+    # path('', RedirectView.as_view(url='students/')),  # Redirect to students app
     path('admin/', admin.site.urls),
     path('students/', include(students_urls)),
     path('report/', include(report_urls)),
     path('', include(account_urls)),
-    path('logout/', auth_views.LogoutView.as_view(template_name='account/logout.html'),
-         name='logout'),
+    path('logout/', auth_views.LogoutView.as_view(template_name='account/logout.html'), name='logout'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

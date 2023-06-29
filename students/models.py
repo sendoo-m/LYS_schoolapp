@@ -69,6 +69,14 @@ class Expense(models.Model):
     date = models.DateField()
     total_owed = models.DecimalField(max_digits=8, decimal_places=2, default=0)
 
+    # def __str__(self):
+    #     return str(self.expense_type)
+
+    # def update_total_owed(self):
+    #     total_installments = self.classroom.student_set.aggregate(total_installments=Sum('installments__amount'))['total_installments'] or 0
+    #     remaining_amount = self.amount - total_installments
+    #     self.total_owed = remaining_amount - self.classroom.fee_per_student + self.get_discounted_amount()
+    #     self.save()
     def __str__(self):
         return str(self.expense_type)
 
@@ -78,6 +86,20 @@ class Expense(models.Model):
         self.total_owed = remaining_amount - self.classroom.fee_per_student + self.get_discounted_amount()
         self.save()
 
+    
+    # def __str__(self):
+    #     return str(self.expense_type)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.classroom.fee_per_student -= self.amount
+        self.classroom.save()
+        self.update_total_owed()
+
+    def update_total_owed(self):
+        total_installments = self.classroom.student_set.aggregate(total_installments=Sum('installments__amount'))['total_installments'] or 0
+        total_owed = self.amount - total_installments
+        self.classroom.student_set.update(total_owed=total_owed)
     
     # def __str__(self):
     #     return str(self.expense_type)
@@ -108,6 +130,12 @@ class Tuition(models.Model):
             self.student.update_total_payments()  # Update total_payments and total_owed for the student
         else:
             self.student.update_total_payments()  # Update total_payments and total_owed for the student when the installment is not paid
+
+    def delete(self, *args, **kwargs):
+        student = self.Student  # Store a reference to the associated student before deleting the tuition
+        super().delete(*args, **kwargs)  # Delete the tuition
+        student.update_total_payments()  # Update total_payments and total_owed for the student
+        student.update_total_owed()  # Update total_owed and total_owed for the student
 
 class Student(models.Model):
     GENDER_CHOICES = (
@@ -147,6 +175,25 @@ class Student(models.Model):
         self.total_owed = self.total_tuition() - self.total_payments
         self.save()
 
+    def save(self, *args, **kwargs):
+        is_new_student = not self.pk
+        super().save(*args, **kwargs)
+
+        if is_new_student:
+            self.total_owed = self.total_tuition()
+            self.save()
+
+    def update_total_payments(self):
+        self.total_payments = self.tuitions.filter(paid=True).aggregate(total_payments=Sum('amount_tuition'))['total_payments'] or 0
+        self.total_owed = self.calculate_total_owed()
+        self.save()
+
+    def calculate_total_owed(self):
+        total_expenses = Expense.objects.filter(classroom__student=self).aggregate(total_expenses=Sum('amount'))['total_expenses'] or 0
+        total_payments = self.total_payments
+        discount = self.get_discounted_amount()
+        return total_expenses - total_payments - discount
+
     def total_students(self):
         return self.student_set.count()
 
@@ -164,15 +211,80 @@ class Student(models.Model):
 
     def get_discounted_amount(self):
         if self.discount == 'CHAIRMAN':
-            return 5000  # Deduct $5000 for Chairman discount
+            return 5000  # Deduct L.E 5000 for Chairman discount
         elif self.discount == 'VICE_CHAIRMAN':
-            return 3000  # Deduct $3000 for Vice Chairman discount
+            return 3000  # Deduct L.E 3000 for Vice Chairman discount
         elif self.discount == 'EMPLOYEE_CHILD':
-            return 4000  # Deduct $4000 for Employee Child discount
+            return 4000  # Deduct L.E 4000 for Employee Child discount
         elif self.discount == 'ARMED_FORCES':
-            return 2000  # Deduct $2000 for Armed Forces discount
+            return 2000  # Deduct L.E 2000 for Armed Forces discount
         else:
             return 0
+
+    # def __str__(self):
+    #     return self.name
+
+    # def total_tuition(self):
+    #     return self.tuitions.aggregate(total_tuition=Sum('amount_tuition'))['total_tuition'] or 0
+
+    # def update_total_payments(self):
+    #     self.total_payments = self.tuitions.filter(paid=True).aggregate(total_payments=Sum('amount_tuition'))['total_payments'] or 0
+    #     self.total_owed = self.total_tuition() - self.total_payments
+    #     self.save()
+
+    # def save(self, *args, **kwargs):
+    #     is_new_student = not self.pk
+    #     super().save(*args, **kwargs)
+
+    #     if is_new_student:
+    #         self.total_owed = self.total_tuition()
+    #         self.save()
+
+    # # def update_total_payments(self):
+    # #     self.total_payments = self.tuitions.filter(paid=True).aggregate(total_payments=Sum('amount_tuition'))['total_payments'] or 0
+    # #     self.total_owed = self.calculate_total_owed()
+    # #     self.save()
+
+    # def calculate_total_owed(self):
+    #     total_expenses = Expense.objects.filter(classroom__student=self).aggregate(total_expenses=Sum('amount'))['total_expenses'] or 0
+    #     total_payments = self.total_payments
+    #     discount = self.get_discounted_amount()
+    #     return total_expenses - total_payments - discount
+
+    # # from my laptop dont it work
+    # def calculate_total_owed(self):
+    #     total_expenses = Expense.objects.filter(classroom__student=self).aggregate(total_expenses=Sum('amount'))['total_expenses'] or 0
+    #     total_payments = self.total_payments
+    #     discount = self.get_discounted_amount()
+    #     return total_expenses - total_payments - discount
+
+
+    # def total_students(self):
+    #     return self.student_set.count()
+
+    # def total_fees_due(self):
+    #     return self.student_set.filter(tuitions__paid=False).aggregate(total_fees_due=Sum('tuitions__amount'))['total_fees_due']
+
+    # def total_paid_students(self):
+    #     return self.student_set.filter(tuitions__paid=True).count()
+
+    # def total_unpaid_students(self):
+    #     return self.student_set.filter(tuitions__paid=False).count()
+
+    # def remaining_tuitions(self):
+    #     return self.student_set.filter(tuitions__paid=False).aggregate(total_remaining_tuitions=Sum('tuitions__amount'))['total_remaining_tuitions']
+
+    # def get_discounted_amount(self):
+    #     if self.discount == 'CHAIRMAN':
+    #         return 5000  # Deduct $5000 for Chairman discount
+    #     elif self.discount == 'VICE_CHAIRMAN':
+    #         return 3000  # Deduct $3000 for Vice Chairman discount
+    #     elif self.discount == 'EMPLOYEE_CHILD':
+    #         return 4000  # Deduct $4000 for Employee Child discount
+    #     elif self.discount == 'ARMED_FORCES':
+    #         return 2000  # Deduct $2000 for Armed Forces discount
+    #     else:
+    #         return 0
     # def __str__(self):
     #     return self.name
 
